@@ -1,1 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Castoro&display=swap');
+/*font-family: 'Castoro', serif; */
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wght@400;500;600;700;800&display=swap');
+/*font-family: 'Encode Sans', sans-serif;*/
+/*available weights: 400 -> 800 */
 
+#content {
+    display: flex;
+    flex-direction: row;
+    height: 100%; 
+    width: 100%;
+    position: fixed; /* Stay in place */
+    z-index: 1; 
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    transition: 1s; 
+    pointer-events: none;
+}
+
+/* enables full-screen map */
+html, body { 
+    height: 100%; 
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+#map {
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    height: 100%;
+    width: 100%;
+}
