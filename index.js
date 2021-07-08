@@ -183,19 +183,27 @@ function handleEdgesCheck(box) {
 
 
 function constructEdgesGeoJSON() {
-    var data = [];
+    var data = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+    console.log(data);
     nodes.forEach(node => {
         node.neighbors.forEach(neigh => {
-            const nodeCoord = [node.latitude, node.longitude];
+            const nodeCoord = [parseFloat(node.longitude), parseFloat(node.latitude)];
             const neighNode = nodes.find(n => n.name == neigh);
-            const neighCoord = [neighNode.latitude, neighNode.longitude]
-            data.push({
-                "type": "LineString",
-                "coordinates": [nodeCoord, neighCoord]
+            const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
+            data.features.push({
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [nodeCoord, neighCoord]
+                }
             })
         })
     });
-    console.log(data);
+    console.log(JSON.stringify(data));
     edgeLayer = L.geoJSON(data);
 }
 
