@@ -39,11 +39,18 @@ body {
 }
 
 #preview-text {
-    height: 350px;
+    height: calc(100% - 94.5px);
     overflow-y: scroll;
 }
 
 /* Nodes Editor */
+#editor-title {
+    display: inline;
+}
+
+#enforceBidir {
+    float: right;
+}
 
 #editor {
     box-sizing: border-box;
@@ -58,8 +65,9 @@ body {
 #table-wrapper {
     height: calc(100% - 86.333px);
     overflow: scroll;
-    
+    word-break: break-all;
 }
+
 /* Scrollbar */
 ::-webkit-scrollbar {
     width: 12px;

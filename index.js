@@ -191,7 +191,7 @@ function handleNeighborChange(e) {
     } 
     // Handle good input
     document.getElementById(e.target.id).style.backgroundColor = "white";
-    enforceBidirectionality(e.target, newNeighbors);
+    enforceBidirectionality();
 }
 
 
@@ -201,16 +201,17 @@ function handleNeighborChange(e) {
 // Ensures that every neighboring pair of neighbors lists each other as a neighbor
 // Given list of new neighbors to check
 // e.g, if N2 has neighbor N5, then the function enforces that N5 has neighbor N2
-function enforceBidirectionality(updatedNode, newNeighbors) {
-    newNeighbors.forEach(neigh => { 
-        var neighNode = nodes.find(node => {
-            console.log(node.name == neigh);
-            return node.name == neigh;
+function enforceBidirectionality() {
+    var msg = "";
+    nodes.forEach(node => {
+        node.neighbors.forEach(neigh => {
+            var neighborNode = nodes.find(n => {return n.name == neigh;});
+            if (neighborNode != null && !neighborNode.neighbors.includes(node.name)) {
+                msg += (neighborNode.name + " is missing neighbor " + node.name + ". Updating... \n");
+            }
         });
-        if (neighNode != undefined && !neighNode.neighbors.includes(neigh)) {
-            alert ("Node '" + neighNode.name + "' is missing neighbor " + updatedNode.name + ". Updating...");
-        }
-    })
+    });
+    alert(msg);
 }
 
 
