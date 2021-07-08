@@ -88,8 +88,8 @@ function drawTable() {
 
 // Draw markers as LeafletJS circles
 function drawMarkers() {
-    const markers = [];
     nodes.forEach(node => {
+        const markers = [];
         const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
             color: 'red',
             fillColor: '#f03',
@@ -99,9 +99,6 @@ function drawMarkers() {
         circle.bindPopup("<b>" + node.id + "</b>");
         markers.push(circle);
     })
-    markersGroup = L.layerGroup(markers)
-    my
-    
 }
 
 function handleChecks() {
