@@ -19,7 +19,7 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
-fetch('Nodes.txt')
+fetch('NodesDeprecated.txt')
     .then(response => response.text())
     .then(txt => {
         nodesTxt = txt.replaceAll("\r\n", "");
@@ -100,6 +100,7 @@ function drawMarkers() {
         markers.push(circle);
     })
     markersGroup = L.layerGroup(markers)
+    my
     
 }
 
