@@ -19,10 +19,10 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
-fetch('NodesDeprecated.txt')
+fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
-        nodesTxt = txt.replaceAll("\r\n", "");
+        nodesTxt = txt.replaceAll("\r\n", ",");
         drawPreview()
         parseNodes()
         drawTable();
@@ -30,6 +30,7 @@ fetch('NodesDeprecated.txt')
         console.log(nodes);
     })
 
+    
 // Update preview of Nodes.txt with given text
 function drawPreview() {
     previewTextEl.textContent = nodesTxt;
@@ -47,37 +48,69 @@ function drawPreview() {
 //        neighbors [array of neighbor node names]
 //    }
 function parseNodes() {
-    // for each line in Nodes.txt
-    nodesTxt.split(",").forEach(line => {
-        // convert each line to array, remove "" elements
-        line = line.split(" ");
-        line = line.filter(el => {
-            return el != "";
-        });
 
-        var neighborsList = []
-        // for each token in the current 
-        line.slice(3, line.length).forEach(id => {
-            if (isNaN(id)) {
-                neighborsList.push(id);
-            }
-        })
+    //splits code into lines
+    var lines = nodesTxt.split(",");
+
+
+    //finds the number of unique nodes
+    var nodeCount = parseInt(lines[0]);
+    
+    //creates all nodes without paths to other nodes
+    for(i = 1; i < nodeCount; i++) {
+        let nodeElements = lines[i].split(" ");
+
         nodes.push(
             {
-                id: line[2],
-                latitude: line[0],
-                longitude: line[1],
-                neighbors: neighborsList
+                //'id' now refers to the ID in the text file
+                //old 'id' property renamed as 'name'
+                id: nodeElements[0],
+                name: nodeElements[3],
+                latitude: nodeElements[1],
+                longitude: nodeElements[2],
+                //filled in later
+                neighbors: null
             }
         )
-    })
+    }
+
+    
+    //loops over the rest of the file to find node paths
+    for(i = 1 + nodeCount; lines[i]; ++i) {
+        let nodeElements = lines[i].split(" ");
+
+        //first element is the node that 
+        //everything else in the line connects to
+        var node =
+            nodes.find(node => node.id == nodeElements[0]);
+        var neighborsList = [];
+
+        //loops over all neighboring nodes
+        for(j = 1; nodeElements[j]; ++j) {
+            var neighbor = 
+                nodes.find(node => node.id == nodeElements[j]);
+            
+            //adds only neighbor name to the neighbor list
+            if(neighbor) {
+                neighborsList.push(neighbor.name);
+            }
+                
+        }
+
+        if(node) {
+            node.neighbors = neighborsList;
+        }
+        
+    }
+
 }
+
 
 // Update table view according to "nodes" object
 function drawTable() {
     nodes.forEach(node => {
         const row = nodesTable.insertRow();
-        const cells = ["id", "latitude", "longitude", "neighbors"];
+        const cells = ["name", "latitude", "longitude", "neighbors"];
         cells.forEach(i => {
             cell = row.insertCell();
 
