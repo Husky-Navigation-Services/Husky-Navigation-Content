@@ -110,12 +110,20 @@ function parseNodes() {
 function drawTable() {
     nodes.forEach(node => {
         const row = nodesTable.insertRow();
-        const cells = ["name", "latitude", "longitude", "neighbors"];
+        // Set cell content for name, lat, long
+        const cells = ["name", "latitude", "longitude"];
         cells.forEach(i => {
             cell = row.insertCell();
-
             cell.innerHTML = node[i];
         });
+        // Set cell content for neighbors as text input
+        cell = row.insertCell();
+        const inputBox = document.createElement("input");
+        inputBox.id = node["id"];
+        inputBox.class = "form-control";
+        inputBox.value = node["neighbors"].toString().replaceAll(",", ", ");
+        inputBox.addEventListener ("change", handleNeighborChange);
+        cell.appendChild(inputBox);
     })
 }
 
@@ -160,9 +168,50 @@ function togglePopups(cmd) {
 }
 
 
+function handleNeighborChange(e) {
+    // INPUT VALIDATION
+    var isBadInput = false;
+    var newNeighbors = e.target.value.split(",");
+    newNeighbors = newNeighbors.map(el => {return el.replaceAll(" ", "");}); // remove all spaces
+    // Check for empty element
+    if (newNeighbors.includes("")) {
+        isBadInput = true;
+    }
+    // Check for nonexistent node name
+    newNeighbors.forEach(neighbor => {
+        if (!nodes.some(node => node.name == neighbor)) {
+            isBadInput = true;
+        }
+    });
+    // Handle bad input
+    if (isBadInput) {
+        document.getElementById(e.target.id).style.backgroundColor = "red";
+        alert("wtf r u doin fix that input");
+        return;
+    } 
+    // Handle good input
+    document.getElementById(e.target.id).style.backgroundColor = "white";
+    enforceBidirectionality(e.target, newNeighbors);
+}
 
 
 
+
+
+// Ensures that every neighboring pair of neighbors lists each other as a neighbor
+// Given list of new neighbors to check
+// e.g, if N2 has neighbor N5, then the function enforces that N5 has neighbor N2
+function enforceBidirectionality(updatedNode, newNeighbors) {
+    newNeighbors.forEach(neigh => { 
+        var neighNode = nodes.find(node => {
+            console.log(node.name == neigh);
+            return node.name == neigh;
+        });
+        if (neighNode != undefined && !neighNode.neighbors.includes(neigh)) {
+            alert ("Node '" + neighNode.name + "' is missing neighbor " + updatedNode.name + ". Updating...");
+        }
+    })
+}
 
 
 
