@@ -10,6 +10,7 @@ body {
     height: 100%;
 }
 
+
 .no-gutters {
     margin-right: 0 !important;
     margin-left: 0 !important;
@@ -47,10 +48,17 @@ body {
     box-sizing: border-box;
     padding: 10px;
     width: 100%;
+    height: calc(100vh - 50px);
     border: 1px solid gray;
     color: white;
+    overflow: hidden;
 }
 
+#table-wrapper {
+    height: calc(100% - 86.333px);
+    overflow: scroll;
+    
+}
 /* Scrollbar */
 ::-webkit-scrollbar {
     width: 12px;

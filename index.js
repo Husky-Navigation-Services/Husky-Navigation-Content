@@ -40,12 +40,15 @@ function updatePreview() {
 //        longitude [string]
 //        neighbors [array of neighbor node names]
 //    }
-
 function parseNodes() {
-    const nodeArr = nodesTxt.split(",");
     // for each line in Nodes.txt
-    nodeArr.forEach(line => {
+    nodesTxt.split(",").forEach(line => {
+        // convert each line to array, remove "" elements
         line = line.split(" ");
+        line = line.filter(el => {
+            return el != "";
+        });
+
         var neighborsList = []
         // for each token in the current 
         line.slice(3, line.length).forEach(id => {
@@ -67,7 +70,13 @@ function parseNodes() {
 // Update table view according to "nodes" object
 function updateTable() {
     nodes.forEach(node => {
+        const row = nodesTable.insertRow();
+        const cells = ["id", "latitude", "longitude", "neighbors"];
+        cells.forEach(i => {
+            cell = row.insertCell();
 
+            cell.innerHTML = node[i];
+        });
     })
 }
 
