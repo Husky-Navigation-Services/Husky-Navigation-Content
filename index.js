@@ -5,7 +5,7 @@ const btncheck2 = document.getElementById("btncheck2");
 const btncheck3 = document.getElementById("btncheck3");
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
-var markerGroup; // LeafletJS LayerGroup object containing all markers
+var nodeMarkers = []; // stores all node markers
 
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
@@ -88,16 +88,20 @@ function drawTable() {
 
 // Draw markers as LeafletJS circles
 function drawMarkers() {
+    nodeMarkers = [];
     nodes.forEach(node => {
-        const markers = [];
         const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 1,
             radius: 2
         }).addTo(map);
-        circle.bindPopup("<b>" + node.id + "</b>");
-        markers.push(circle);
+        var popup = L.popup({
+            closeOnClick: false,
+            autoClose: false
+          }).setContent("<b>" + node.id + "</b>")
+        circle.bindPopup(popup);
+        nodeMarkers.push(circle);
     })
 }
 
@@ -109,11 +113,17 @@ function handleChecks() {
     }
 }
 
-function togglePopups() {
-    nodeMarkers.forEach(marker => {
-        marker.openPopup();
-        
-    })
+function togglePopups(cmd) {
+    if (cmd == "on") {
+        nodeMarkers.forEach(marker => {
+            marker.openPopup();
+        })
+    } else {
+        nodeMarkers.forEach(marker => {
+            marker.closePopup();
+        })
+    }
+    
 }
 
 
