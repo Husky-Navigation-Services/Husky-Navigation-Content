@@ -1,5 +1,8 @@
 const previewTextEl = document.getElementById("preview-text");
+var nodesTxt;
+var nodes = [];
 
+// init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
 
 L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
@@ -7,12 +10,22 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
     subdomains: ['a','b','c']
 }).addTo( map );
 
+// init preview
 fetch('Nodes.txt')
-  .then(response => response.text())
-  .then(text => updatePreview(text))
+    .then(response => response.text())
+    .then(txt => {
+        txt = txt.replaceAll("\r\n", "");
+        nodesTxt = txt;
+        previewTextEl.textContent = txt;
+        parseNodes(txt)
+    })
 
-function updatePreview(text) {
-    previewTextEl.textContent = text; 
+function parseNodes(txt) {
+    const nodeArr = txt.split(",");
+    console.log(nodeArr);
+    nodeArr.forEach(node => {
+        console.log(node);
+    })
 }
 
 /*
