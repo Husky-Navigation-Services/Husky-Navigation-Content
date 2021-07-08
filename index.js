@@ -1,7 +1,11 @@
 const previewTextEl = document.getElementById("preview-text");
 const nodesTable = document.getElementById("nodes-table");
+const showPopupsCheck = document.getElementById("btncheck1");
+const btncheck2 = document.getElementById("btncheck2");
+const btncheck3 = document.getElementById("btncheck3");
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
+var markerGroup; // LeafletJS LayerGroup object containing all markers
 
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
@@ -11,6 +15,7 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
     subdomains: ['a','b','c']
 }).addTo( map );
 
+// MAIN
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
@@ -18,14 +23,15 @@ fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
         nodesTxt = txt.replaceAll("\r\n", "");
-        updatePreview()
+        drawPreview()
         parseNodes()
-        updateTable();
+        drawTable();
+        drawMarkers();
         console.log(nodes);
     })
 
 // Update preview of Nodes.txt with given text
-function updatePreview() {
+function drawPreview() {
     previewTextEl.textContent = nodesTxt;
 }
 
@@ -68,7 +74,7 @@ function parseNodes() {
 }
 
 // Update table view according to "nodes" object
-function updateTable() {
+function drawTable() {
     nodes.forEach(node => {
         const row = nodesTable.insertRow();
         const cells = ["id", "latitude", "longitude", "neighbors"];
@@ -80,8 +86,37 @@ function updateTable() {
     })
 }
 
+// Draw markers as LeafletJS circles
+function drawMarkers() {
+    const markers = [];
+    nodes.forEach(node => {
+        const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 1,
+            radius: 2
+        }).addTo(map);
+        circle.bindPopup("<b>" + node.id + "</b>");
+        markers.push(circle);
+    })
+    markersGroup = L.layerGroup(markers)
+    
+}
 
+function handleChecks() {
+    if (showPopupsCheck.checked) {
+        togglePopups("on");
+    } else {
+        togglePopups("off");
+    }
+}
 
+function togglePopups() {
+    nodeMarkers.forEach(marker => {
+        marker.openPopup();
+        
+    })
+}
 
 
 
