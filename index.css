@@ -41,8 +41,22 @@ body {
 #preview-text {
     height: calc(100% - 94.5px);
     overflow-y: scroll;
+    font-size: 15px;
 }
 
+#preview-title {
+    display: inline;
+}
+
+#update-prev-btn {
+    float: right;
+}
+
+#save-btn {
+    float: right;
+    margin-right: 5px;
+    margin-left: 5px;
+}
 /* Nodes Editor */
 #editor-title {
     display: inline;
@@ -85,9 +99,7 @@ body {
 
 /* Map Options */
 #map-options {
-    position: fixed;
-    right: 50%;
-    top: 5px;
+    
 
 }
 

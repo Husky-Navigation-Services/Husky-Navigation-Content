@@ -6,7 +6,8 @@ const btncheck3 = document.getElementById("btncheck3");
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
-
+var tableContentRows = [];
+var edgeLayer; // Leaflet geoJSON layer
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
 
@@ -22,18 +23,19 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
-        nodesTxt = txt.replaceAll("\r\n", ",");
-        drawPreview()
-        parseNodes()
+        nodesTxt = txt;
+        drawPreview();
+        parseNodes();
         drawTable();
         drawMarkers();
+        constructEdgesGeoJSON();
         console.log(nodes);
     })
 
     
 // Update preview of Nodes.txt with given text
 function drawPreview() {
-    previewTextEl.textContent = nodesTxt;
+    previewTextEl.innerHTML = nodesTxt.replaceAll("\r\n", " <br /> ");
 }
 
 // Given a string of nodes in the standard format:
@@ -50,14 +52,14 @@ function drawPreview() {
 function parseNodes() {
 
     //splits code into lines
-    var lines = nodesTxt.split(",");
+    var lines = nodesTxt.replaceAll("\r\n", ",").split(",");
 
 
     //finds the number of unique nodes
     var nodeCount = parseInt(lines[0]);
     
     //creates all nodes without paths to other nodes
-    for(i = 1; i < nodeCount; i++) {
+    for(i = 1; i <= nodeCount; i++) {
         let nodeElements = lines[i].split(" ");
 
         nodes.push(
@@ -108,8 +110,12 @@ function parseNodes() {
 
 // Update table view according to "nodes" object
 function drawTable() {
+    // remove all existing content rows
+    tableContentRows.forEach(row => row.remove());
     nodes.forEach(node => {
         const row = nodesTable.insertRow();
+        tableContentRows.push(row);
+
         // Set cell content for name, lat, long
         const cells = ["name", "latitude", "longitude"];
         cells.forEach(i => {
@@ -146,8 +152,8 @@ function drawMarkers() {
     })
 }
 
-function handleChecks() {
-    if (showPopupsCheck.checked) {
+function handlePopupCheck(box) {
+    if (box.checked) {
         togglePopups("on");
     } else {
         togglePopups("off");
@@ -164,9 +170,34 @@ function togglePopups(cmd) {
             marker.closePopup();
         })
     }
+}
+
+function handleEdgesCheck(box) {
+    if (box.checked) {
+        edgeLayer.addTo(map);
+    } else {
+        map.removeLayer(edgeLayer);
+    }
     
 }
 
+
+function constructEdgesGeoJSON() {
+    var data = [];
+    nodes.forEach(node => {
+        node.neighbors.forEach(neigh => {
+            const nodeCoord = [node.latitude, node.longitude];
+            const neighNode = nodes.find(n => n.name == neigh);
+            const neighCoord = [neighNode.latitude, neighNode.longitude]
+            data.push({
+                "type": "LineString",
+                "coordinates": [nodeCoord, neighCoord]
+            })
+        })
+    });
+    console.log(data);
+    edgeLayer = L.geoJSON(data);
+}
 
 function handleNeighborChange(e) {
     // INPUT VALIDATION
@@ -185,13 +216,14 @@ function handleNeighborChange(e) {
     });
     // Handle bad input
     if (isBadInput) {
-        document.getElementById(e.target.id).style.backgroundColor = "red";
+        e.target.style.backgroundColor = "red";
         alert("wtf r u doin fix that input");
         return;
     } 
     // Handle good input
-    document.getElementById(e.target.id).style.backgroundColor = "white";
-    enforceBidirectionality();
+    e.target.style.backgroundColor = "white";
+    // Update changed node with new neighbors
+    nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
 }
 
 
@@ -202,16 +234,54 @@ function handleNeighborChange(e) {
 // Given list of new neighbors to check
 // e.g, if N2 has neighbor N5, then the function enforces that N5 has neighbor N2
 function enforceBidirectionality() {
+    var inputError = false;
+    nodes.forEach(node => {
+        if (document.getElementById(node.id).style.backgroundColor == "red") {
+            alert("wtf you doin fix the input first .-.");
+            inputError = true;
+        }
+    })
+    if (inputError) {
+        return;
+    }
+
     var msg = "";
     nodes.forEach(node => {
         node.neighbors.forEach(neigh => {
             var neighborNode = nodes.find(n => {return n.name == neigh;});
             if (neighborNode != null && !neighborNode.neighbors.includes(node.name)) {
                 msg += (neighborNode.name + " is missing neighbor " + node.name + ". Updating... \n");
+                neighborNode.neighbors.push(node.name);
             }
         });
     });
-    alert(msg);
+    if (msg == "") {
+        alert("Nothing to fix!")
+    } else {
+        alert(msg);
+    }
+    drawTable();
+}
+
+function updatePreview() {
+    var res = "";
+    // write # of nodes to first line
+    res += nodes.length + "<br />";  
+    // write each node id/lat/long/name to first half
+    nodes.forEach(node => {
+        res += node.id + " " + node.latitude + " " + node.longitude + " " + node.name + "<br />";
+    });
+    // write each node id/neigh1/neigh2/etc. to second half
+    nodes.forEach(node => {
+        res += node.id + " " + node.neighbors.map(neighbor => nodes.find(n => n.name == neighbor).id).toString().replaceAll("[", "").replaceAll("]", "").replaceAll(",", " ") + "<br />";
+    }) 
+    nodesTxt = res;
+    drawPreview();
+    alert("Done");
+}
+
+function save() {
+    alert("TODO")
 }
 
 
