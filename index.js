@@ -323,8 +323,10 @@ var circleArray = [];
 var nodesToAdd = [];
 var addedNodes = 0;
 var nameOffset = 0;
+
 function nodeEvent(e) {
-     
+    
+
     var pos = e.latlng;
     
     if(nodesToAdd[nodesToAdd.length - 1]) {
@@ -355,7 +357,6 @@ function nodeEvent(e) {
             neighbors: []
         });
     }
-    alert(nodesToAdd[nodesToAdd.length - 1].id);
 
     addedNodes++;
     nameOffset++;
