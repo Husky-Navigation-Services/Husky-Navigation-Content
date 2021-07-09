@@ -26,14 +26,11 @@
                   
                     <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" onclick="handleEdgesCheck(this)">
                     <label id = "mid-checkbox" class="btn btn-outline-light" for="btncheck2">Show Edges</label>
-                  
-                    <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off" onclick="handleNodeMode(this);">
-                    <label class="btn btn-outline-light" for="btncheck3">Add Nodes</label>
+
                 </div>
         </nav>
 
-        </div>
-        <div class="container-fluid no-gutters">
+        <div id = "page" class="container-fluid no-gutters">
           <div class="row no-gutters">
               <div class="col-6 no-gutters">
                 
@@ -49,14 +46,22 @@
               <div class="col-6 no-gutters">
                   <div id="editor" class = "bg-dark">
                       <h3 id="editor-title">Editor</h3>
-                      <button id="enforceBidir" type="button" class="btn btn-warning" onclick="enforceBidirectionality()">Enforce Bidirectionality</button>
-                      <button id="delete-btn" type="button" class="btn btn-danger" >Delete Node</button>
-                      <button id="new-btn" type="button" class="btn btn-success" >New Node</button>
+                      <button id="enforceBidir" type="button" class="btn btn-primary" onclick="enforceBidirectionality()">Enforce Bidirectionality</button>
+                      <div id="editor-options" class="btn-group" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorOptionChange()">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" ">
+                        <label class="btn btn-outline-success" for="btnradio1">Add Nodes</label>
+                      
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+                        <label class="btn btn-outline-warning" for="btnradio2">Modify Nodes</label>
+                      
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                        <label class="btn btn-outline-danger" for="btnradio3">Delete Nodes</label>
+                      </div>
                       
                       
                       <hr>
                       <div id="table-wrapper">
-                        <table id="nodes-table" class="table table-dark table-striped">
+                        <table id="nodes-table" class="table table-dark">
                             <thead>
                               <tr>
                                 <th scope="col">Id</th>
