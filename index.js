@@ -507,6 +507,7 @@ function deleteNodeEvent(e) {
     drawMarkers();
     drawTable();
     constructEdgesGeoJSON();
+    handleEdgesCheck(btncheck2);
     enterDeleteNodeMode(); // to re-attatch event listeners to the newly-generated markers
     
 }
