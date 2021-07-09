@@ -146,8 +146,9 @@ function drawMarkers() {
         }).addTo(map);
         var popup = L.popup({
             closeOnClick: false,
-            autoClose: false
-          }).setContent("<b>" + node.id + "</b>")
+            autoClose: false,
+            closeButton: true
+          }).setContent("<small>" + node.name + "</small>")
         circle.bindPopup(popup);
         nodeMarkers.push(circle);
     })
@@ -233,6 +234,12 @@ function handleNeighborChange(e) {
     e.target.style.backgroundColor = "white";
     // Update changed node with new neighbors
     nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
+    // Update edges
+    map.removeLayer(edgeLayer);
+    constructEdgesGeoJSON();
+    
+    handleEdgesCheck(btncheck2);
+
 }
 
 

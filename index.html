@@ -18,7 +18,7 @@
     <body>
         <nav class="navbar navbar-dark bg-dark">
             <div class="container-fluid justify-content-space-between">
-                <span class="navbar-brand mb-0 h1">Husky Navigation: Content</span>
+                <span class="navbar-brand mb-0 h1">Husky Navigation <span class="badge bg-secondary">Content</span></span>
 
                 <div id = "map-options" class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
                     <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" onclick="handlePopupCheck(this)">
@@ -49,7 +49,11 @@
               <div class="col-6 no-gutters">
                   <div id="editor" class = "bg-dark">
                       <h3 id="editor-title">Editor</h3>
-                      <button id ="enforceBidir" type="button" class="btn btn-primary" onclick="enforceBidirectionality()">Enforce Bidirectionality</button>
+                      <button id="enforceBidir" type="button" class="btn btn-warning" onclick="enforceBidirectionality()">Enforce Bidirectionality</button>
+                      <button id="delete-btn" type="button" class="btn btn-danger" >Delete Node</button>
+                      <button id="new-btn" type="button" class="btn btn-success" >New Node</button>
+                      
+                      
                       <hr>
                       <div id="table-wrapper">
                         <table id="nodes-table" class="table table-dark table-striped">
