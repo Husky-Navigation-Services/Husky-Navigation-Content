@@ -257,7 +257,6 @@ function handleNeighborChange(e) {
 
     nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
     // Update edges
-    removeLayer(edgeLayer);
     constructEdgesGeoJSON();
     
     handleEdgesCheck(btncheck2);
