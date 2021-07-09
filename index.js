@@ -8,6 +8,7 @@ var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
+
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
 
@@ -241,7 +242,7 @@ function handleNeighborChange(e) {
 // Ensures that every neighboring pair of neighbors lists each other as a neighbor
 // Given list of new neighbors to check
 // e.g, if N2 has neighbor N5, then the function enforces that N5 has neighbor N2
-function enforceBidirectionality() {
+function enforceBidirectionality(displayMessage) {
     var inputError = false;
     nodes.forEach(node => {
         if (document.getElementById(node.id).style.backgroundColor == "red") {
@@ -255,6 +256,7 @@ function enforceBidirectionality() {
 
     var msg = "";
     nodes.forEach(node => {
+        console.log(node.neighbors);
         node.neighbors.forEach(neigh => {
             var neighborNode = nodes.find(n => {return n.name == neigh;});
             if (neighborNode != null && !neighborNode.neighbors.includes(node.name)) {
@@ -263,11 +265,14 @@ function enforceBidirectionality() {
             }
         });
     });
-    if (msg == "") {
-        alert("Nothing to fix!")
-    } else {
-        alert(msg);
+    if(displayMessage) {
+        if (msg == "") {
+            alert("Nothing to fix!")
+        } else {
+            alert(msg);
+        }
     }
+    
     drawTable();
 }
 
@@ -293,49 +298,88 @@ function save() {
 }
 
 
+function handleNodeMode(box) {
 
 
+    if(box.checked) {
+        map.on('click', nodeEvent);
+        enterNodeMode();
+    } else {
+        map.off('click', nodeEvent);
+        exitNodeMode();
+    }
+    
+}
+
+var circleArray = [];
+var nodesToAdd = [];
+var addedNodes = 0;
+function nodeEvent(e) {
+     
+    var pos = e.latlng;
+    
+    if(nodesToAdd[nodesToAdd.length - 1]) {
+        var neighbor = nodesToAdd[nodesToAdd.length - 1].name;
+    }
+
+    if(neighbor) {
+        nodesToAdd.push( {
+            id: parseInt(nodes.length + addedNodes + 1),
+            name: 'N' + (parseInt(nodes.length) +
+                parseInt(addedNodes) + 1),
+            latitude: pos.lat,
+            longitude: pos.lng,
+            neighbors: [neighbor]
+        });
+    } else {
+        nodesToAdd.push( {
+            id: parseInt(nodes.length + addedNodes + 1),
+            name: 'N' + (parseInt(nodes.length) +
+                parseInt(addedNodes) + 1),
+            latitude: pos.lat,
+            longitude: pos.lng,
+            neighbors: []
+        });
+    }
+
+    addedNodes++;
+
+    const circle = L.circle(pos, {
+        color: 'green',
+        fillColor: 'green',
+        fillOpacity: 1,
+        radius: 3
+    }).addTo(map);
+    
+    circleArray.push(circle);
+}
+
+//useless, but may be used for more functionality later
+function enterNodeMode(nodeEvent) {
 
 
+}
 
+function exitNodeMode() {
+    
 
+    nodes = nodes.concat(nodesToAdd);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-// Returns the downloaded file given a containing url and file name.
-// download("https://huskynavigationcontent.azurewebsites.net/Nodes.txt","Nodes.txt")
-function download(url, filename) {
-    fetch(url).then(function(t) {
-        return t.blob().then((b)=>{
-            var a = document.createElement("a");
-            a.href = URL.createObjectURL(b);
-            a.setAttribute("download", filename);
-            a.click();
-        }
-        );
+    circleArray.forEach(circle => {
+        map.removeLayer(circle);
     });
+
+    console.log(nodes);
+    drawTable();
+    drawMarkers();
+
+    enforceBidirectionality(false);
+    
+    constructEdgesGeoJSON();
+
+    nodesToAdd = [];
+
 }
 
-// Labels nodes and paths given the Nodes.txt file.
-function nodesSetup(nodes.txt) {
 
-}
-*/
+
