@@ -41,7 +41,6 @@ fetch('Nodes.txt')
         drawTable();
         drawMarkers();
         constructEdgesGeoJSON();
-        enterConnectNodeMode();
     })
 
     
@@ -201,7 +200,7 @@ function drawMarkers() {
         }).addTo(map);
         var popup = L.popup({
             closeOnClick: false,
-            autoClose: false,
+            autoClose: true,
             closeButton: true
           }).setContent("<small>" + node.name + "</small>")
         circle.bindPopup(popup);
