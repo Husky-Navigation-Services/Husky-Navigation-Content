@@ -238,6 +238,7 @@ function handleNeighborChange(e) {
     // Handle good input
     e.target.style.backgroundColor = "white";
     // Update changed node with new neighbors
+
     nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
     // Update edges
     map.removeLayer(edgeLayer);
@@ -315,19 +316,27 @@ function save() {
 var circleArray = [];
 var nodesToAdd = [];
 var addedNodes = 0;
+var nameOffset = 0;
+
 function nodeEvent(e) {
-     
+    
+
     var pos = e.latlng;
     
     if(nodesToAdd[nodesToAdd.length - 1]) {
         var neighbor = nodesToAdd[nodesToAdd.length - 1].name;
     }
 
+    while(nodes.find(n => n.name == ['N' + (parseInt(nodes.length) +
+        parseInt(nameOffset) + 1)])) {
+            nameOffset++;
+    }
+
     if(neighbor) {
         nodesToAdd.push( {
             id: parseInt(nodes.length + addedNodes + 1),
             name: 'N' + (parseInt(nodes.length) +
-                parseInt(addedNodes) + 1),
+                parseInt(nameOffset) + 1),
             latitude: pos.lat,
             longitude: pos.lng,
             neighbors: [neighbor]
@@ -336,7 +345,7 @@ function nodeEvent(e) {
         nodesToAdd.push( {
             id: parseInt(nodes.length + addedNodes + 1),
             name: 'N' + (parseInt(nodes.length) +
-                parseInt(addedNodes) + 1),
+                parseInt(nameOffset) + 1),
             latitude: pos.lat,
             longitude: pos.lng,
             neighbors: []
@@ -344,6 +353,7 @@ function nodeEvent(e) {
     }
 
     addedNodes++;
+    nameOffset++;
 
     const circle = L.circle(pos, {
         color: 'green',
@@ -372,6 +382,8 @@ function exitAddNodeMode() {
     console.log(nodes);
     drawTable();
     drawMarkers();
+    drawTable();
+
     enforceBidirectionality(false);
     constructEdgesGeoJSON();
 
