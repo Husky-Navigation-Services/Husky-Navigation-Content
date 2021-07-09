@@ -32,7 +32,7 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
-fetch("https://github.com/Husky-Navigation-Services/Husky-Navigation/blob/main/Server/src/main/resources/Nodes.txt")
+fetch("https://husky-navigation-services.github.io/Husky-Navigation-Content/Nodes.txt")
 .then(response => response.text())
 .then(txt => console.log(txt))
 
