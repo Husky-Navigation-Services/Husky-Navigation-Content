@@ -30,6 +30,16 @@
                 </div>
         </nav>
 
+        <div id="delete-container">
+            <h3 id="form-header">Form: Delete Nodes</h3>
+            <h6 id="form-text">List the nodes names to delete in a comma separated list:</h6>
+            
+                <form onsubmit="deleteNodes(this)">
+                    <input id="delete-nodes-input" type="text" class="form-control" placeholder="Eg. N1, N2, N3" aria-label="Username" aria-describedby="addon-wrapping">
+                </form>
+
+        </div>
+
         <div id = "page" class="container-fluid no-gutters">
           <div class="row no-gutters">
               <div class="col-6 no-gutters">

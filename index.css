@@ -19,6 +19,41 @@ body {
     padding-right: 0 !important;
 }
 
+/* Delete Form */
+#delete-container {
+    /* centering and layout */
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, 0);
+    width: 500px;
+    height: 250px;
+    z-index: 1001;
+    /* design */
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: white;
+    /* initial display */
+    display: none;
+}
+
+#form-header {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    text-decoration: underline;
+}
+
+#form-text{
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#delete-nodes-input {
+    margin:auto;
+    width: 200px !important;
+}
 /* Map */
 
 #map { 

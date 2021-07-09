@@ -8,6 +8,8 @@ const addNodesRadio = document.getElementById("btnradio1");
 const modifyNodesRadio = document.getElementById("btnradio2");
 const deleteNodesRadio = document.getElementById("btnradio3");
 
+const page = document.getElementById("page");
+const deleteForm = document.getElementById("delete-container");
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
@@ -35,7 +37,7 @@ fetch('Nodes.txt')
         drawTable();
         drawMarkers();
         constructEdgesGeoJSON();
-        console.log(nodes);
+       
     })
 
     
@@ -194,7 +196,6 @@ function constructEdgesGeoJSON() {
         "type": "FeatureCollection",
         "features": []
     };
-    console.log(data);
     nodes.forEach(node => {
         node.neighbors.forEach(neigh => {
             const nodeCoord = [parseFloat(node.longitude), parseFloat(node.latitude)];
@@ -210,7 +211,7 @@ function constructEdgesGeoJSON() {
             })
         })
     });
-    console.log(JSON.stringify(data));
+
     edgeLayer = L.geoJSON(data);
 }
 
@@ -269,7 +270,6 @@ function enforceBidirectionality(displayMessage) {
 
     var msg = "";
     nodes.forEach(node => {
-        console.log(node.neighbors);
         node.neighbors.forEach(neigh => {
             var neighborNode = nodes.find(n => {return n.name == neigh;});
             if (neighborNode != null && !neighborNode.neighbors.includes(node.name)) {
@@ -379,7 +379,6 @@ function exitAddNodeMode() {
         map.removeLayer(circle);
     });
 
-    console.log(nodes);
     drawTable();
     drawMarkers();
     drawTable();
@@ -392,20 +391,32 @@ function exitAddNodeMode() {
 
 function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
+        console.log("hello1");
         enterAddNodeMode();
         nodesTable.style.filter = "blur(8px)";
         nodesTable.style.pointerEvents = "none";
+        page.style.filter = ""; 
+        deleteForm.style.display = "none";
     } else if (modifyNodesRadio.checked) {
+        console.log("hello2");
         map.off('click', nodeEvent);
         exitAddNodeMode();
         nodesTable.style.filter = "none";
         nodesTable.style.pointerEvents = "";
+        page.style.filter = ""; 
+        deleteForm.style.display = "none";
     } else {
+        console.log("hello3");
         map.off('click', nodeEvent);
         exitAddNodeMode();
         nodesTable.style.filter = "none";
         nodesTable.style.pointerEvents = "";
+        page.style.filter = "blur(8px)"; 
+        deleteForm.style.display = "block";
     }
 }
 
-
+function deleteNodes(e) {
+    
+    alert("TODO: handle form submit");
+}
