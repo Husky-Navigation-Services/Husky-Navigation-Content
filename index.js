@@ -221,7 +221,6 @@ function constructEdgesGeoJSON() {
     });
 
     edgeLayer = L.geoJSON(data);
-    console.log(edgeLayerGroup);
     try {
         edgeLayerGroup.addLayer(edgeLayer);
     } catch(ignore) {
@@ -237,7 +236,7 @@ function handleNeighborChange(e) {
     newNeighbors = newNeighbors.map(el => {return el.replaceAll(" ", "");}); // remove all spaces
     // Check for empty element
     if (newNeighbors.includes("")) {
-        isBadInput = true;
+        isBadInput = true; 
     }
     // Check for nonexistent node name
     newNeighbors.forEach(neighbor => {
@@ -253,12 +252,35 @@ function handleNeighborChange(e) {
     } 
     // Handle good input
     e.target.style.backgroundColor = "white";
-    // Update changed node with new neighbors
+    
 
-    nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
+    var thisNode = nodes.find(n => n.id == e.target.id);
+    
+    // Update affected neighbor's neighbor list
+    thisNode.neighbors.forEach(old => {
+        
+        if(!newNeighbors.includes(old)) {
+            
+            var other = nodes.find(n => n.name == old).neighbors;
+            const index = other.indexOf(thisNode.name);
+            if (index > -1) {
+                other.splice(index, 1);
+            }
+        }
+    })
+
+    // Update changed node with new neighbors
+    thisNode.neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
+    
+
+
     // Update edges
     constructEdgesGeoJSON();
     
+    // Update table
+    drawTable();
+    
+
     handleEdgesCheck(btncheck2);
 
 }
@@ -408,14 +430,12 @@ function exitAddNodeMode() {
 
 function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
-        console.log("hello1");
         enterAddNodeMode();
         nodesTable.style.filter = "blur(8px)";
         nodesTable.style.pointerEvents = "none";
         page.style.filter = ""; 
         deleteForm.style.display = "none";
     } else if (modifyNodesRadio.checked) {
-        console.log("hello2");
         map.off('click', nodeEvent);
         exitAddNodeMode();
         nodesTable.style.filter = "none";
@@ -423,7 +443,6 @@ function handleEditorOptionChange() {
         page.style.filter = ""; 
         deleteForm.style.display = "none";
     } else if(deleteNodesRadio.checked){
-        console.log("hello3");
         map.off('click', nodeEvent);
         exitAddNodeMode();
         nodesTable.style.filter = "none";
