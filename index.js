@@ -8,6 +8,8 @@ const addNodesRadio = document.getElementById("btnradio1");
 const modifyNodesRadio = document.getElementById("btnradio2");
 const deleteNodesRadio = document.getElementById("btnradio3");
 
+const viewRadio = document.getElementById("btnradio11");
+
 const page = document.getElementById("page");
 const deleteForm = document.getElementById("delete-container");
 var nodesTxt; // unparsed node text
@@ -16,6 +18,7 @@ var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
+var inModifyMode = false;
 
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
@@ -125,22 +128,30 @@ function drawTable() {
         const row = nodesTable.insertRow();
         tableContentRows.push(row);
 
-        // Set cell content for name, lat, long
-        const cells = ["name", "latitude", "longitude", "neighbors"];
-        cells.forEach(i => {
+        if (inModifyMode) {
+            // Set cell content for name, lat, long
+            const cells = ["name", "latitude", "longitude"];
+            cells.forEach(i => {
+                cell = row.insertCell();
+                cell.innerHTML = node[i];
+            });
+            // Set cell content for neighbors as text input
             cell = row.insertCell();
-            cell.innerHTML = node[i];
-        });
-        // Set cell content for neighbors as text input
-        /*
-        cell = row.insertCell();
-        const inputBox = document.createElement("input");
-        inputBox.id = node["id"];
-        inputBox.class = "form-control";
-        inputBox.value = node["neighbors"].toString().replaceAll(",", ", ");
-        inputBox.addEventListener ("change", handleNeighborChange);
-        cell.appendChild(inputBox);
-        */
+            const inputBox = document.createElement("input");
+            inputBox.id = node["id"];
+            inputBox.class = "form-control";
+            inputBox.value = node["neighbors"].toString().replaceAll(",", ", ");
+            inputBox.addEventListener ("change", handleNeighborChange);
+            cell.appendChild(inputBox);
+        } else {
+            // Set cell content for name, lat, long, neighbors
+            const cells = ["name", "latitude", "longitude", "neighbors"];
+            cells.forEach(i => {
+                cell = row.insertCell();
+                cell.innerHTML = node[i];
+            });
+        }   
+
     })
 }
 
@@ -237,7 +248,7 @@ function constructEdgesGeoJSON() {
     
 }
 
-/*
+
 function handleNeighborChange(e) {
     // INPUT VALIDATION
     var isBadInput = false;
@@ -293,7 +304,7 @@ function handleNeighborChange(e) {
     handleEdgesCheck(btncheck2);
 
 }
-*/
+
 
 
 
@@ -492,3 +503,13 @@ function connectNodeEvent(e) {
 function deleteNodes(e) {
     alert("TODO: handle form submit");
 }
+
+function handleEditorTableOptionChange() {
+    if (viewRadio.checked) {
+        inModifyMode = false;
+    } else {
+        inModifyMode = true;
+    }
+    drawTable();
+}
+
