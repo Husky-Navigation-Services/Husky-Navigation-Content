@@ -125,12 +125,13 @@ function drawTable() {
         tableContentRows.push(row);
 
         // Set cell content for name, lat, long
-        const cells = ["name", "latitude", "longitude"];
+        const cells = ["name", "latitude", "longitude", "neighbors"];
         cells.forEach(i => {
             cell = row.insertCell();
             cell.innerHTML = node[i];
         });
         // Set cell content for neighbors as text input
+        /*
         cell = row.insertCell();
         const inputBox = document.createElement("input");
         inputBox.id = node["id"];
@@ -138,6 +139,7 @@ function drawTable() {
         inputBox.value = node["neighbors"].toString().replaceAll(",", ", ");
         inputBox.addEventListener ("change", handleNeighborChange);
         cell.appendChild(inputBox);
+        */
     })
 }
 
@@ -215,6 +217,7 @@ function constructEdgesGeoJSON() {
     edgeLayer = L.geoJSON(data);
 }
 
+/*
 function handleNeighborChange(e) {
     // INPUT VALIDATION
     var isBadInput = false;
@@ -248,7 +251,7 @@ function handleNeighborChange(e) {
     handleEdgesCheck(btncheck2);
 
 }
-
+*/
 
 
 
@@ -371,7 +374,7 @@ function enterAddNodeMode() {
 }
 
 function exitAddNodeMode() {
-    
+    map.off('click', nodeEvent);
 
     nodes = nodes.concat(nodesToAdd);
 
@@ -391,28 +394,13 @@ function exitAddNodeMode() {
 
 function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
-        console.log("hello1");
         enterAddNodeMode();
-        nodesTable.style.filter = "blur(8px)";
-        nodesTable.style.pointerEvents = "none";
-        page.style.filter = ""; 
-        deleteForm.style.display = "none";
     } else if (modifyNodesRadio.checked) {
-        console.log("hello2");
-        map.off('click', nodeEvent);
+        
         exitAddNodeMode();
-        nodesTable.style.filter = "none";
-        nodesTable.style.pointerEvents = "";
-        page.style.filter = ""; 
-        deleteForm.style.display = "none";
     } else {
-        console.log("hello3");
-        map.off('click', nodeEvent);
+
         exitAddNodeMode();
-        nodesTable.style.filter = "none";
-        nodesTable.style.pointerEvents = "";
-        page.style.filter = "blur(8px)"; 
-        deleteForm.style.display = "block";
     }
 }
 
