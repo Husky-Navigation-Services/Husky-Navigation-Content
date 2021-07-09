@@ -3,6 +3,11 @@ const nodesTable = document.getElementById("nodes-table");
 const showPopupsCheck = document.getElementById("btncheck1");
 const btncheck2 = document.getElementById("btncheck2");
 const btncheck3 = document.getElementById("btncheck3");
+
+const addNodesRadio = document.getElementById("btnradio1");
+const modifyNodesRadio = document.getElementById("btnradio2");
+const deleteNodesRadio = document.getElementById("btnradio3");
+
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
@@ -305,18 +310,7 @@ function save() {
 }
 
 
-function handleNodeMode(box) {
 
-
-    if(box.checked) {
-        map.on('click', nodeEvent);
-        enterNodeMode();
-    } else {
-        map.off('click', nodeEvent);
-        exitNodeMode();
-    }
-    
-}
 
 var circleArray = [];
 var nodesToAdd = [];
@@ -362,12 +356,11 @@ function nodeEvent(e) {
 }
 
 //useless, but may be used for more functionality later
-function enterNodeMode(nodeEvent) {
-
-
+function enterAddNodeMode() {
+    map.on('click', nodeEvent);
 }
 
-function exitNodeMode() {
+function exitAddNodeMode() {
     
 
     nodes = nodes.concat(nodesToAdd);
@@ -379,15 +372,28 @@ function exitNodeMode() {
     console.log(nodes);
     drawTable();
     drawMarkers();
-    drawTable();
-    
     enforceBidirectionality(false);
-    
     constructEdgesGeoJSON();
 
     nodesToAdd = [];
-
 }
 
+function handleEditorOptionChange() {
+    if (addNodesRadio.checked) {
+        enterAddNodeMode();
+        nodesTable.style.filter = "blur(8px)";
+        nodesTable.style.pointerEvents = "none";
+    } else if (modifyNodesRadio.checked) {
+        map.off('click', nodeEvent);
+        exitAddNodeMode();
+        nodesTable.style.filter = "none";
+        nodesTable.style.pointerEvents = "";
+    } else {
+        map.off('click', nodeEvent);
+        exitAddNodeMode();
+        nodesTable.style.filter = "none";
+        nodesTable.style.pointerEvents = "";
+    }
+}
 
 

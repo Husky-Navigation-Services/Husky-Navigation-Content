@@ -77,21 +77,16 @@ body {
     overflow: hidden;
 }
 
+#editor-options {
+    float: right;
+}
+
 #table-wrapper {
     height: calc(100% - 86.333px);
     overflow: scroll;
     word-break: break-all;
 }
 
-#new-btn {
-    float:right;
-    margin-left: 5px;
-}
-
-#delete-btn {
-    float: right;
-    margin-left: 5px;
-}
 
 /* Scrollbar */
 ::-webkit-scrollbar {
