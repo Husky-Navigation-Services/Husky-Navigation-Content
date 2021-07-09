@@ -129,20 +129,28 @@ function drawTable() {
         tableContentRows.push(row);
 
         if (inModifyMode) {
-            // Set cell content for name, lat, long
-            const cells = ["name", "latitude", "longitude"];
+            // Set cell content for name as text input
+            cell = row.insertCell();
+            const inputNameBox = document.createElement("input");
+            inputNameBox.id = node["name"];
+            inputNameBox.class = "form-control";
+            inputNameBox.value = node["name"].toString().replaceAll(",", ", ");
+            inputNameBox.addEventListener ("change", handleNameChange);
+            cell.appendChild(inputNameBox);
+            // Set cell content for lat, long
+            const cells = ["latitude", "longitude"];
             cells.forEach(i => {
                 cell = row.insertCell();
                 cell.innerHTML = node[i];
             });
             // Set cell content for neighbors as text input
             cell = row.insertCell();
-            const inputBox = document.createElement("input");
-            inputBox.id = node["id"];
-            inputBox.class = "form-control";
-            inputBox.value = node["neighbors"].toString().replaceAll(",", ", ");
-            inputBox.addEventListener ("change", handleNeighborChange);
-            cell.appendChild(inputBox);
+            const inputNeighborsBox = document.createElement("input");
+            inputNeighborsBox.id = node["id"];
+            inputNeighborsBox.class = "form-control";
+            inputNeighborsBox.value = node["neighbors"].toString().replaceAll(",", ", ");
+            inputNeighborsBox.addEventListener ("change", handleNeighborChange);
+            cell.appendChild(inputNeighborsBox);
         } else {
             // Set cell content for name, lat, long, neighbors
             const cells = ["name", "latitude", "longitude", "neighbors"];
