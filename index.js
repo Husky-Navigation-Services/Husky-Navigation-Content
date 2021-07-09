@@ -38,7 +38,7 @@ fetch('Nodes.txt')
         drawTable();
         drawMarkers();
         constructEdgesGeoJSON();
-       
+        enterConnectNodeMode();
     })
 
     
@@ -146,7 +146,11 @@ function drawTable() {
 
 // Draw markers as LeafletJS circles
 function drawMarkers() {
+    nodeMarkers.forEach(m => {
+        map.removeLayer(m);
+    })
     nodeMarkers = [];
+    console.log(nodes.length);
     nodes.forEach(node => {
         const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
             color: 'red',
@@ -160,6 +164,7 @@ function drawMarkers() {
             closeButton: true
           }).setContent("<small>" + node.name + "</small>")
         circle.bindPopup(popup);
+        circle.nodeName = node.name; // custom property
         nodeMarkers.push(circle);
     })
 }
@@ -198,6 +203,7 @@ function handleEdgesCheck(box) {
         edgeModeOn = false;
     }
     
+    edgeLayer.bringToBack();
 }
 
 
@@ -296,17 +302,6 @@ function handleNeighborChange(e) {
 // Given list of new neighbors to check
 // e.g, if N2 has neighbor N5, then the function enforces that N5 has neighbor N2
 function enforceBidirectionality(displayMessage) {
-    var inputError = false;
-    nodes.forEach(node => {
-        if (document.getElementById(node.id).style.backgroundColor == "red") {
-            alert("wtf you doin fix the input first .-.");
-            inputError = true;
-        }
-    })
-    if (inputError) {
-        return;
-    }
-
     var msg = "";
     nodes.forEach(node => {
         node.neighbors.forEach(neigh => {
@@ -358,8 +353,6 @@ var addedNodes = 0;
 var nameOffset = 0;
 
 function nodeEvent(e) {
-    
-
     var pos = e.latlng;
     
     if(nodesToAdd[nodesToAdd.length - 1]) {
@@ -418,9 +411,10 @@ function exitAddNodeMode() {
         map.removeLayer(circle);
     });
 
+    
+
     drawTable();
     drawMarkers();
-    drawTable();
 
     enforceBidirectionality(false);
     constructEdgesGeoJSON();
@@ -428,6 +422,7 @@ function exitAddNodeMode() {
     if(edgeModeOn) {
         map.removeLayer(edgeLayer);
         edgeLayer.addTo(map);
+        edgeLayer.bringToBack();
     }
 
     nodesToAdd = [];
@@ -435,17 +430,65 @@ function exitAddNodeMode() {
 
 function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
+        exitConnectNodeMode();
         enterAddNodeMode();
-    } else if (modifyNodesRadio.checked) {
         
+    } else if (modifyNodesRadio.checked) {
+        console.log("entered");
         exitAddNodeMode();
+        enterConnectNodeMode();
+        
     } else {
-
+        exitConnectNodeMode();
         exitAddNodeMode();
     }
 }
 
-function deleteNodes(e) {
+function enterConnectNodeMode() {
     
+    nodeMarkers.forEach(circle => {
+        circle.on('click', connectNodeEvent);
+        console.log("1");
+    });
+}
+function exitConnectNodeMode() {
+    nodeMarkers.forEach(circle => {
+        circle.off('click', connectNodeEvent);
+        console.log("1");
+    });
+}
+
+var firstCircle = null;
+
+function connectNodeEvent(e) {
+    console.log("works");
+    var clickedCircle = e.target;
+    if (!firstCircle) { // if first circle wasn't already clicked
+        firstCircle = clickedCircle.nodeName;
+        console.log("first circle :" + clickedCircle);
+        return;
+    } else { // if first circle was already clicked
+        console.log("second circle");
+        var firstNode = nodes.find(n => n.name == firstCircle);
+        if (!firstNode.neighbors.includes(clickedCircle.nodeName)) {
+            firstNode.neighbors.push(clickedCircle.nodeName);
+        } else {
+            alert("Stop adding duplicate connections!");
+        }
+        firstCircle = null;
+        drawTable();
+        constructEdgesGeoJSON();
+        enforceBidirectionality();
+        if(edgeModeOn) {
+            map.removeLayer(edgeLayer);
+            edgeLayer.addTo(map);
+            edgeLayer.bringToBack();
+        }
+        return;
+    }
+    
+}
+
+function deleteNodes(e) {
     alert("TODO: handle form submit");
 }
