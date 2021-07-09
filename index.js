@@ -199,8 +199,8 @@ function drawMarkers() {
             radius: 2
         }).addTo(map);
         var popup = L.popup({
-            closeOnClick: false,
-            autoClose: true,
+            closeOnClick: true,
+            autoClose: false,
             closeButton: true
           }).setContent("<small>" + node.name + "</small>")
         circle.bindPopup(popup);
