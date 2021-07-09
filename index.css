@@ -64,6 +64,7 @@ body {
 
 #enforceBidir {
     float: right;
+    margin-left: 5px;
 }
 
 #editor {
@@ -80,6 +81,16 @@ body {
     height: calc(100% - 86.333px);
     overflow: scroll;
     word-break: break-all;
+}
+
+#new-btn {
+    float:right;
+    margin-left: 5px;
+}
+
+#delete-btn {
+    float: right;
+    margin-left: 5px;
 }
 
 /* Scrollbar */
@@ -133,3 +144,14 @@ body {
     width: 100%;
 }
 */
+
+.leaflet-popup {
+    margin-bottom: 20px;
+}
+
+.leaflet-popup-content{
+    margin-bottom: 2px;
+    margin-top: 2px;
+    text-align: center;
+}
+
