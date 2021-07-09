@@ -15,6 +15,7 @@ var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
+var edgeLayerGroup = L.layerGroup([]);
 
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
@@ -180,12 +181,19 @@ function togglePopups(cmd) {
         })
     }
 }
+var edgeModeOn = false;
 
 function handleEdgesCheck(box) {
+
+    edgeLayerGroup.eachLayer(function(layer) {
+        map.removeLayer(layer);
+    })
+
     if (box.checked) {
         edgeLayer.addTo(map);
+        edgeModeOn = true;
     } else {
-        map.removeLayer(edgeLayer);
+        edgeModeOn = false;
     }
     
 }
@@ -213,6 +221,13 @@ function constructEdgesGeoJSON() {
     });
 
     edgeLayer = L.geoJSON(data);
+    console.log(edgeLayerGroup);
+    try {
+        edgeLayerGroup.addLayer(edgeLayer);
+    } catch(ignore) {
+
+    }
+    
 }
 
 function handleNeighborChange(e) {
@@ -242,7 +257,7 @@ function handleNeighborChange(e) {
 
     nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
     // Update edges
-    map.removeLayer(edgeLayer);
+    removeLayer(edgeLayer);
     constructEdgesGeoJSON();
     
     handleEdgesCheck(btncheck2);
@@ -371,8 +386,6 @@ function enterAddNodeMode() {
 }
 
 function exitAddNodeMode() {
-    
-
     nodes = nodes.concat(nodesToAdd);
 
     circleArray.forEach(circle => {
@@ -385,6 +398,11 @@ function exitAddNodeMode() {
 
     enforceBidirectionality(false);
     constructEdgesGeoJSON();
+
+    if(edgeModeOn) {
+        map.removeLayer(edgeLayer);
+        edgeLayer.addTo(map);
+    }
 
     nodesToAdd = [];
 }
@@ -405,7 +423,7 @@ function handleEditorOptionChange() {
         nodesTable.style.pointerEvents = "";
         page.style.filter = ""; 
         deleteForm.style.display = "none";
-    } else {
+    } else if(deleteNodesRadio.checked){
         console.log("hello3");
         map.off('click', nodeEvent);
         exitAddNodeMode();
@@ -413,6 +431,13 @@ function handleEditorOptionChange() {
         nodesTable.style.pointerEvents = "";
         page.style.filter = "blur(8px)"; 
         deleteForm.style.display = "block";
+    } else {
+        map.off('click', nodeEvent);
+        exitAddNodeMode();
+        nodesTable.style.filter = "none";
+        nodesTable.style.pointerEvents = "none";
+        page.style.filter = ""; 
+        deleteForm.style.display = "none";
     }
 }
 
