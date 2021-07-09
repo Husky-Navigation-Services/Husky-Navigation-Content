@@ -379,7 +379,8 @@ function exitNodeMode() {
     console.log(nodes);
     drawTable();
     drawMarkers();
-
+    drawTable();
+    
     enforceBidirectionality(false);
     
     constructEdgesGeoJSON();
