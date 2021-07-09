@@ -430,11 +430,7 @@ function exitAddNodeMode() {
     enforceBidirectionality(false);
     constructEdgesGeoJSON();
 
-    if(edgeModeOn) {
-        map.removeLayer(edgeLayer);
-        edgeLayer.addTo(map);
-        edgeLayer.bringToBack();
-    }
+    redrawEdges()
 
     nodesToAdd = [];
 }
@@ -442,16 +438,56 @@ function exitAddNodeMode() {
 function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
         exitConnectNodeMode();
+        exitDeleteNodeMode();
         enterAddNodeMode();
         
     } else if (modifyNodesRadio.checked) {
         console.log("entered");
         exitAddNodeMode();
+        exitDeleteNodeMode();
         enterConnectNodeMode();
         
     } else {
         exitConnectNodeMode();
         exitAddNodeMode();
+        enterDeleteNodeMode()
+    }
+}
+
+function enterDeleteNodeMode() {
+    nodeMarkers.forEach(circle => {
+        circle.on('click', deleteNodeEvent);
+    });
+}
+
+function exitDeleteNodeMode() {
+    nodeMarkers.forEach(circle => {
+        circle.off('click', deleteNodeEvent);
+    });
+}
+
+function deleteNodeEvent(e) {
+    map.removeLayer(e.target);
+    nodes = nodes.filter(n => n.name != e.target.nodeName);
+    deleteAllNeighborsByName(e.target.nodeName);
+    drawMarkers();
+    drawTable();
+    constructEdgesGeoJSON();
+    enterDeleteNodeMode(); // to re-attatch event listeners to the newly-generated markers
+    
+}
+
+function deleteAllNeighborsByName(name) {
+    nodes.forEach(node => {
+        node.neighbors = node.neighbors.filter(neigh => neigh != name);
+    })
+}
+
+function redrawEdges() {
+    if(edgeModeOn) {
+        map.removeLayer(edgeLayer);
+        edgeLayer.addTo(map);
+        edgeLayer.bringToBack();
     }
 }
 
@@ -490,11 +526,7 @@ function connectNodeEvent(e) {
         drawTable();
         constructEdgesGeoJSON();
         enforceBidirectionality();
-        if(edgeModeOn) {
-            map.removeLayer(edgeLayer);
-            edgeLayer.addTo(map);
-            edgeLayer.bringToBack();
-        }
+        redrawEdges();
         return;
     }
     
