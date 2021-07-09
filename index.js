@@ -130,9 +130,9 @@ function drawTable() {
 
         if (inModifyMode) {
             // Set cell content for name as text input
-            cell = row.insertCell();
+            var cell = row.insertCell();
             const inputNameBox = document.createElement("input");
-            inputNameBox.id = node["name"];
+            inputNameBox.id = node["id"];
             inputNameBox.class = "form-control";
             inputNameBox.value = node["name"].toString().replaceAll(",", ", ");
             inputNameBox.addEventListener ("change", handleNameChange);
@@ -161,6 +161,28 @@ function drawTable() {
         }   
 
     })
+}
+
+function handleNameChange(e) {
+    const node = nodes.find(n => n.id == e.target.id);
+    console.log(node.name)
+    const originalName = node.name;
+    const newName = e.target.value;
+    
+    // update neighbor names to new name
+    nodes.forEach(n => {
+        n.neighbors = n.neighbors.map(neigh => {
+            if (neigh == originalName) {
+                console.log(originalName);
+                return newName;
+            } else {
+                return neigh;
+            }
+        });
+    });
+    // update node name to new name
+    node.name = newName;
+    drawMarkers();
 }
 
 // Draw markers as LeafletJS circles
