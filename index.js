@@ -15,6 +15,7 @@ var nodes = []; // parsed list of node objects for internal representation
 var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
+var edgeLayerGroup = L.layerGroup([]);
 
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
@@ -182,12 +183,19 @@ function togglePopups(cmd) {
         })
     }
 }
+var edgeModeOn = false;
 
 function handleEdgesCheck(box) {
+
+    edgeLayerGroup.eachLayer(function(layer) {
+        map.removeLayer(layer);
+    })
+
     if (box.checked) {
         edgeLayer.addTo(map);
+        edgeModeOn = true;
     } else {
-        map.removeLayer(edgeLayer);
+        edgeModeOn = false;
     }
     
 }
@@ -215,6 +223,12 @@ function constructEdgesGeoJSON() {
     });
 
     edgeLayer = L.geoJSON(data);
+    try {
+        edgeLayerGroup.addLayer(edgeLayer);
+    } catch(ignore) {
+
+    }
+    
 }
 
 /*
@@ -225,7 +239,7 @@ function handleNeighborChange(e) {
     newNeighbors = newNeighbors.map(el => {return el.replaceAll(" ", "");}); // remove all spaces
     // Check for empty element
     if (newNeighbors.includes("")) {
-        isBadInput = true;
+        isBadInput = true; 
     }
     // Check for nonexistent node name
     newNeighbors.forEach(neighbor => {
@@ -241,13 +255,35 @@ function handleNeighborChange(e) {
     } 
     // Handle good input
     e.target.style.backgroundColor = "white";
-    // Update changed node with new neighbors
+    
 
-    nodes.find(n => n.id == e.target.id).neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
+    var thisNode = nodes.find(n => n.id == e.target.id);
+    
+    // Update affected neighbor's neighbor list
+    thisNode.neighbors.forEach(old => {
+        
+        if(!newNeighbors.includes(old)) {
+            
+            var other = nodes.find(n => n.name == old).neighbors;
+            const index = other.indexOf(thisNode.name);
+            if (index > -1) {
+                other.splice(index, 1);
+            }
+        }
+    })
+
+    // Update changed node with new neighbors
+    thisNode.neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
+    
+
+
     // Update edges
-    map.removeLayer(edgeLayer);
     constructEdgesGeoJSON();
     
+    // Update table
+    drawTable();
+    
+
     handleEdgesCheck(btncheck2);
 
 }
@@ -388,6 +424,11 @@ function exitAddNodeMode() {
 
     enforceBidirectionality(false);
     constructEdgesGeoJSON();
+
+    if(edgeModeOn) {
+        map.removeLayer(edgeLayer);
+        edgeLayer.addTo(map);
+    }
 
     nodesToAdd = [];
 }
