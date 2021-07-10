@@ -19,6 +19,11 @@ body {
     padding-right: 0 !important;
 }
 
+/* Navbar */
+#navbar-title {
+    font-size: calc(1.1rem + .6vw);
+}
+
 /* Map */
 
 #map { 
