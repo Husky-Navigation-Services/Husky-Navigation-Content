@@ -89,10 +89,13 @@ function parseNodes() {
     //finds the number of unique nodes
     var nodeCount = parseInt(lines[0]);
     
+    
+
+
     //creates all nodes without paths to other nodes
     for(i = 1; i <= nodeCount; i++) {
         let nodeElements = lines[i].split(" ");
-
+        console.log(nodes.find(n => n.id == nodeElements[0]));
         nodes.push(
             {
                 //'id' now refers to the ID in the text file
@@ -106,7 +109,6 @@ function parseNodes() {
             }
         )
     }
-
     
     //loops over the rest of the file to find node paths
     for(i = 1 + nodeCount; lines[i]; ++i) {
@@ -133,7 +135,7 @@ function parseNodes() {
         if(node) {
             node.neighbors = neighborsList;
         }
-        
+
     }
 
 }
