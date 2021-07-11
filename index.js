@@ -419,14 +419,16 @@ function nodeEvent(e) {
         var neighbor = nodesToAdd[nodesToAdd.length - 1].name;
     }
 
-    while(nodes.find(n => n.name == ['N' + (parseInt(nodes.length) +
+    //checks for duplicate names or IDs and corrects
+    while(nodes.find(n => n.id == parseInt(nodes.length + addedNodes + nameOffset + 1)) || 
+        nodes.find(n => n.name == ['N' + (parseInt(nodes.length) +
         parseInt(nameOffset) + 1)])) {
             nameOffset++;
     }
 
     if(neighbor) {
         nodesToAdd.push( {
-            id: parseInt(nodes.length + addedNodes + 1),
+            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
             name: 'N' + (parseInt(nodes.length) +
                 parseInt(nameOffset) + 1),
             latitude: pos.lat,
@@ -435,7 +437,7 @@ function nodeEvent(e) {
         });
     } else {
         nodesToAdd.push( {
-            id: parseInt(nodes.length + addedNodes + 1),
+            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
             name: 'N' + (parseInt(nodes.length) +
                 parseInt(nameOffset) + 1),
             latitude: pos.lat,
