@@ -254,7 +254,7 @@ function handleEdgesCheck(box) {
     edgeLayerGroup.eachLayer(function(layer) {
         map.removeLayer(layer);
     })
-    if (!box.checked) {
+    if (box.checked) {
         edgeLayer.addTo(map);
         edgeModeOn = true;
     } else {
