@@ -20,6 +20,16 @@ var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
 var inModifyMode = false;
 
+// init toasts
+var toastEl =document.getElementById('save-toast');//select id of toast
+var toast = new bootstrap.Toast(toastEl);//inizialize it
+setInterval(function() {
+    toast.show();
+}, 60000); 
+
+    
+
+
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
 
@@ -481,10 +491,14 @@ function handleEditorOptionChange() {
         exitDeleteNodeMode();
         enterConnectNodeMode();
         
-    } else {
+    } else if (deleteNodesRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
         enterDeleteNodeMode()
+    } else {
+        exitConnectNodeMode();
+        exitAddNodeMode();
+        exitDeleteNodeMode()
     }
 }
 
@@ -572,6 +586,7 @@ function deleteNodes(e) {
 }
 
 function handleEditorTableOptionChange() {
+    handleEditorOptionChange();
     if (viewRadio.checked) {
         inModifyMode = false;
     } else {
@@ -591,4 +606,18 @@ function download(filename, text) {
     element.click();
   
     document.body.removeChild(element);
-  }
+}
+
+function filterTable(e) {
+    console.log(e.value);
+    const q = e.value;
+    const tableRows = document.querySelectorAll("tr");
+    tableRows.forEach(row => {
+        const curNode = row.children[0].innerHTML;
+        if (curNode.toLowerCase().startsWith(q.toLowerCase())) {
+            row.style.display = "table-row";
+        } else if (curNode != "Id") {
+            row.style.display = "none";
+        }
+    });
+}
