@@ -20,8 +20,14 @@ body {
     padding-right: 0 !important;
 }
 
-/* Navbar */
-
+/* Save Alert */
+#save-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 5000;
+    background-color: rgba(255,255,255,1);
+}
 
 /* Map */
 

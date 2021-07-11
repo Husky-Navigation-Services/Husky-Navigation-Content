@@ -20,6 +20,16 @@ var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
 var inModifyMode = false;
 
+// init toasts
+var toastEl =document.getElementById('save-toast');//select id of toast
+var toast = new bootstrap.Toast(toastEl);//inizialize it
+setInterval(function() {
+    toast.show();
+}, 60000); 
+
+    
+
+
 // init map 
 var map = L.map('map').setView([47.6532, -122.3074], 16);
 
