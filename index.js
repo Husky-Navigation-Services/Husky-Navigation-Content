@@ -14,11 +14,14 @@ const page = document.getElementById("page");
 const deleteForm = document.getElementById("delete-container");
 var nodesTxt; // unparsed node text
 var nodes = []; // parsed list of node objects for internal representation
+var ogNodes = []; // makes sure undo doesn't go past this
+var prevNodes = [[]]; // stores previous nodes to allow for change reversion
 var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
 var inModifyMode = false;
+var keys = []; //keys track of keys pressed for commands
 
 // init toasts
 var toastEl =document.getElementById('save-toast');//select id of toast
@@ -61,6 +64,8 @@ fetch('Nodes.txt')
         drawTable();
         drawMarkers();
         constructEdgesGeoJSON();
+        handleCommands();
+        commandLoop();
     })
 
     
@@ -137,6 +142,8 @@ function parseNodes() {
         }
 
     }
+
+    ogNodes = nodes;
 
 }
 
@@ -467,21 +474,12 @@ function enterAddNodeMode() {
 function exitAddNodeMode() {
     map.off('click', nodeEvent);
 
+
+    prevNodes.push(nodes);
+
     nodes = nodes.concat(nodesToAdd);
-
-    circleArray.forEach(circle => {
-        map.removeLayer(circle);
-    });
-
     
-
-    drawTable();
-    drawMarkers();
-
-    enforceBidirectionality(false);
-    constructEdgesGeoJSON();
-
-    redrawEdges()
+    drawNodeElements();
 
     nodesToAdd = [];
 }
@@ -525,7 +523,6 @@ function deleteNodeEvent(e) {
     map.removeLayer(e.target);
     nodes = nodes.filter(n => n.name != e.target.nodeName);
     deleteAllNeighborsByName(e.target.nodeName);
-    drawMarkers();
     drawTable();
     constructEdgesGeoJSON();
     handleEdgesCheck(btncheck2);
@@ -627,4 +624,108 @@ function filterTable(e) {
             row.style.display = "none";
         }
     });
+}
+
+//sets a keyCode index as true if a key is currently pressed
+//e.g. if ctrl is pressed keys[17] will be true.
+function handleCommands() {
+
+    document.addEventListener("keydown", function(e) {
+        keys[e.keyCode] = true;
+        }
+    , false);
+
+    document.addEventListener('keyup', function(e) {
+        keys[e.keyCode] = false;
+        }
+    , false);
+}
+
+//checks keys pressed every 10ms for commands
+//add new commands here
+function commandLoop() {
+
+    switch(true) {
+        //ctrl + z
+        case keys[17] && keys[90]:
+            handleUndo();
+            break;
+        //ctrl + y
+        case keys[17] && keys[89]:
+            handleRedo();
+            break;
+    }
+
+
+    setTimeout(commandLoop, 10);
+}
+
+var undoneNodes = [[]];
+function handleUndo() {
+
+    var update = prevNodes.pop();
+    
+    if(update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
+
+        undoneNodes.push(nodes);
+        
+        nodes = update;
+        
+        drawNodeElements();
+    }
+    
+
+}
+
+function handleRedo() {
+
+    var update = undoneNodes.pop();
+
+    if(update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
+
+        prevNodes.push(nodes);
+
+        nodes = update;
+        
+        drawNodeElements();
+    }
+
+}
+
+//quick way to redraw nodes
+function drawNodeElements() {
+
+    circleArray.forEach(circle => {
+        map.removeLayer(circle);
+    });
+
+    drawTable();
+    drawMarkers();
+
+    enforceBidirectionality(false);
+    constructEdgesGeoJSON();
+
+    redrawEdges()
+
+    handleEdgesCheck(btncheck2);
+}
+
+function isSameArrayByElems(ar1, ar2) {
+
+    if(ar1.length == ar2.length) {
+
+        for(i = 0; i < ar1.length; i++) {
+
+            if(ar1[i] != ar2[i]) {
+                return false;
+            }
+
+        }
+
+    } else {
+        return false;
+    }
+
+    return true;
+
 }
