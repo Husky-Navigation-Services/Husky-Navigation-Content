@@ -25,7 +25,7 @@ var toastEl =document.getElementById('save-toast');//select id of toast
 var toast = new bootstrap.Toast(toastEl);//inizialize it
 setInterval(function() {
     toast.show();
-}, 60000); 
+}, 600000); 
 
     
 
