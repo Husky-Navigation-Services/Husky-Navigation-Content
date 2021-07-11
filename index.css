@@ -9,6 +9,7 @@
 body {
     height: 100%;
     width: 100%;
+    overflow-y: hidden;
 }
 
 
@@ -17,6 +18,15 @@ body {
     margin-left: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+}
+
+/* Save Alert */
+#save-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 5000;
+    background-color: rgba(255,255,255,1);
 }
 
 /* Map */
@@ -63,8 +73,10 @@ body {
     margin-right: auto;
 }
 
-#enforceBidir {
-    
+#search-input {
+    display: inline-block;
+    width: 200px;
+    margin: 2.5px;
 }
 
 #editor {
@@ -84,6 +96,10 @@ body {
     margin-left: auto;
 }
 
+#enforceBidir {
+    display: none;
+}
+
 #editor-table-options {
     margin-left: auto;
 }
@@ -93,12 +109,25 @@ body {
     height: max-content;
 }
 
-
-
 #table-wrapper {
     height: calc(100% - 86.333px);
     overflow: scroll;
     word-break: break-all;
+}
+
+.fixed {
+    table-layout:fixed;
+    
+}
+td { 
+    width: 100px;
+    height: 50px;
+    
+   
+}
+
+tr {
+    overflow: hidden;
 }
 
 

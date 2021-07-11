@@ -20,6 +20,16 @@ var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
 var inModifyMode = false;
 
+// init toasts
+var toastEl =document.getElementById('save-toast');//select id of toast
+var toast = new bootstrap.Toast(toastEl);//inizialize it
+setInterval(function() {
+    toast.show();
+}, 600000); 
+
+    
+
+
 // init map 
 this.map = L.map('map', {
     //sets click tolerance for elements on map
@@ -38,6 +48,10 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
+fetch("https://husky-navigation-services.github.io/Husky-Navigation-Content/Nodes.txt")
+.then(response => response.text())
+.then(txt => console.log(txt))
+
 fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
@@ -205,8 +219,8 @@ function drawMarkers() {
             radius: 2
         }).addTo(map);
         var popup = L.popup({
-            closeOnClick: false,
-            autoClose: true,
+            closeOnClick: true,
+            autoClose: false,
             closeButton: true
           }).setContent("<small>" + node.name + "</small>")
         circle.bindPopup(popup);
@@ -388,7 +402,7 @@ function updatePreview() {
 
 function save() {
     enforceBidirectionality();
-    download("Nodes", nodesTxt);
+    download("Nodes", nodesTxt.replaceAll("<br />", "%0A"));
 }
 
 
@@ -483,10 +497,14 @@ function handleEditorOptionChange() {
         exitDeleteNodeMode();
         enterConnectNodeMode();
         
-    } else {
+    } else if (deleteNodesRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
         enterDeleteNodeMode()
+    } else {
+        exitConnectNodeMode();
+        exitAddNodeMode();
+        exitDeleteNodeMode()
     }
 }
 
@@ -574,6 +592,7 @@ function deleteNodes(e) {
 }
 
 function handleEditorTableOptionChange() {
+    handleEditorOptionChange();
     if (viewRadio.checked) {
         inModifyMode = false;
     } else {
@@ -593,4 +612,18 @@ function download(filename, text) {
     element.click();
   
     document.body.removeChild(element);
-  }
+}
+
+function filterTable(e) {
+    console.log(e.value);
+    const q = e.value;
+    const tableRows = document.querySelectorAll("tr");
+    tableRows.forEach(row => {
+        const curNode = row.children[0].innerHTML;
+        if (curNode.toLowerCase().startsWith(q.toLowerCase())) {
+            row.style.display = "table-row";
+        } else if (curNode != "Id") {
+            row.style.display = "none";
+        }
+    });
+}
