@@ -481,10 +481,14 @@ function handleEditorOptionChange() {
         exitDeleteNodeMode();
         enterConnectNodeMode();
         
-    } else {
+    } else if (deleteNodesRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
         enterDeleteNodeMode()
+    } else {
+        exitConnectNodeMode();
+        exitAddNodeMode();
+        exitDeleteNodeMode()
     }
 }
 
@@ -572,6 +576,7 @@ function deleteNodes(e) {
 }
 
 function handleEditorTableOptionChange() {
+    handleEditorOptionChange();
     if (viewRadio.checked) {
         inModifyMode = false;
     } else {
@@ -591,4 +596,18 @@ function download(filename, text) {
     element.click();
   
     document.body.removeChild(element);
-  }
+}
+
+function filterTable(e) {
+    console.log(e.value);
+    const q = e.value;
+    const tableRows = document.querySelectorAll("tr");
+    tableRows.forEach(row => {
+        const curNode = row.children[0].innerHTML;
+        if (curNode.toLowerCase().startsWith(q.toLowerCase())) {
+            row.style.display = "table-row";
+        } else if (curNode != "Id") {
+            row.style.display = "none";
+        }
+    });
+}

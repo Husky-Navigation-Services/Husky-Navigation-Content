@@ -53,35 +53,38 @@
                             <h3 id="editor-title">Editor</h3>
                             <div id="editor-options" class="btn-group" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorOptionChange()">
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" ">
-                                <label class="btn btn-outline-success option" for="btnradio1">Add Nodes</label>
+                                <label class="btn btn-outline-success option" for="btnradio1">Add</label>
                             
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                                <label class="btn btn-outline-warning option" for="btnradio2">Connect Nodes</label>
+                                <label class="btn btn-outline-warning option" for="btnradio2">Connect</label>
                             
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                                <label class="btn btn-outline-danger option" for="btnradio3">Delete Nodes</label>
-                            </div>
-                            <button id="enforceBidir" type="button" class="btn btn-primary option" onclick="enforceBidirectionality()">Enforce Bidirectionality</button>
+                                <label class="btn btn-outline-danger option" for="btnradio3">Delete</label>
+                            </div>  
+                            <button id="enforceBidir" type="button" class="btn btn-primary option" onclick="enforceBidirectionality()">Tidy Data</button>
+                            
                         </div>
-                        <div id="editor-table-options" class="btn-group option" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorTableOptionChange()">
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio11" autocomplete="off" checked>
-                            <label class="btn btn-outline-info" for="btnradio11">View Table</label>
-                        
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio22" autocomplete="off" >
-                            <label class="btn btn-outline-info" for="btnradio22">Modify Table</label>
-
+                        <div style="display:flex; justify-content: flex-end;">
+                            <input id="search-input" type="text" class="form-control" placeholder="" oninput="filterTable(this)">
+                            <div id="editor-table-options" class="btn-group option" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorTableOptionChange()">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio11" autocomplete="off" checked>
+                                <label class="btn btn-outline-info" for="btnradio11">View Table</label>
+                            
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio22" autocomplete="off" >
+                                <label class="btn btn-outline-info" for="btnradio22">Modify Table</label>
+                            </div>
                         </div>
                     </div>
                       
                       <hr>
                       <div id="table-wrapper">
-                        <table id="nodes-table" class="table table-dark">
+                        <table id="nodes-table" class="table table-dark fixed" >
                             <thead>
                               <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Lat</th>
-                                <th scope="col">Long</th>
-                                <th scope="col">Neighbors</th>
+                                <th scope="col" style="width: 100px;">Id</th>
+                                <th scope="col" style="width: 100px;">Lat</th>
+                                <th scope="col" style="width: 100px;">Long</th>
+                                <th scope="col" style="width: 100px;">Neighbors</th>
                               </tr>
                             </thead>
                             <tbody>
