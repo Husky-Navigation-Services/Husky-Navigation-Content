@@ -38,7 +38,7 @@ this.map = L.map('map', {
     //sets click tolerance for elements on map
     //sets padding to remove element clipping
     renderer: L.canvas({ tolerance: 10,
-                        padding: 1}),
+                        padding: 2}),
     fullscreenControl: true
     
 }).setView([47.6532, -122.3074], 16);
@@ -690,7 +690,7 @@ function handleRedo() {
         prevNodes.push(nodes);
 
         nodes = update;
-        
+
         drawNodeElements();
     }
 
