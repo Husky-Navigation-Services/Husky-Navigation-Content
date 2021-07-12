@@ -38,8 +38,12 @@ this.map = L.map('map', {
     //sets click tolerance for elements on map
     //sets padding to remove element clipping
     renderer: L.canvas({ tolerance: 10,
-                         padding: 5 })
+                        padding: 1}),
+    fullscreenControl: true
+    
 }).setView([47.6532, -122.3074], 16);
+
+
 
 
 L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
