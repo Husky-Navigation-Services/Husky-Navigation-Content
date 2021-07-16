@@ -63,7 +63,7 @@ var y, z, A = {
     className: "uw-tilelayer"
 };
 z = "https://www.washington.edu/maps/wp-content/themes/maps-2014/tiles/retina/{z}/{x}/{y}.png"
-L.tileLayer(z, A).addTo(mymap);
+y = L.tileLayer(z, A).addTo(map);
 
 // MAIN
 // Update preview with Nodes.txt data,
