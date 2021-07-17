@@ -6,7 +6,8 @@ const btncheck3 = document.getElementById("btncheck3");
 
 const addNodesRadio = document.getElementById("btnradio1");
 const modifyNodesRadio = document.getElementById("btnradio2");
-const deleteNodesRadio = document.getElementById("btnradio3");
+const lassoConnectRadio = document.getElementById("btnradio3");
+const deleteNodesRadio = document.getElementById("btnradio4");
 
 const viewRadio = document.getElementById("btnradio11");
 
@@ -30,9 +31,6 @@ setInterval(function() {
     toast.show();
 }, 600000); 
 
-    
-
-
 // init map 
 this.map = L.map('map', {
     //sets click tolerance for elements on map
@@ -42,15 +40,13 @@ this.map = L.map('map', {
     fullscreenControl: true
     
 }).setView([47.6532, -122.3074], 16);
-
-
-
-
 L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     subdomains: ['a','b','c']
 }).addTo( map );
 
+
+/*
 var r = [-122.32296105, 47.64674039, -122.28707804, 47.66318327]
 var w = new L.LatLngBounds(new L.LatLng(r[1],r[0]),new L.LatLng(r[3],r[2]))
 var overlay, z, A = {
@@ -64,6 +60,7 @@ var overlay, z, A = {
 };
 z = "https://www.washington.edu/maps/wp-content/themes/maps-2014/tiles/retina/{z}/{x}/{y}.png"
 overlay = L.tileLayer(z, A);
+*/
 
 // MAIN
 // Update preview with Nodes.txt data,
@@ -506,23 +503,59 @@ function handleEditorOptionChange() {
     if (addNodesRadio.checked) {
         exitConnectNodeMode();
         exitDeleteNodeMode();
+        exitLassoMode();
         enterAddNodeMode();
-        
     } else if (modifyNodesRadio.checked) {
-        console.log("entered");
         exitAddNodeMode();
         exitDeleteNodeMode();
+        exitLassoMode();
         enterConnectNodeMode();
-        
     } else if (deleteNodesRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
+        exitLassoMode();
         enterDeleteNodeMode()
+    } else if (lassoConnectRadio.checked) {
+        exitConnectNodeMode();
+        exitAddNodeMode();
+        exitDeleteNodeMode();
+        enterLassoMode();
     } else {
         exitConnectNodeMode();
         exitAddNodeMode();
-        exitDeleteNodeMode()
+        exitDeleteNodeMode();
+        exitLassoMode();
     }
+}
+
+map.on('lasso.finished', event => {
+    handleFinishedLasso(event.layers);
+});
+
+function enterLassoMode() {
+    L.control.lasso().addTo(map).enable();
+}
+
+
+function handleFinishedLasso(layers) {
+    const selectedNodes = [];
+    layers.forEach(l => {
+        l.nodeName ? selectedNodes.push(l.nodeName) : null;
+    });
+    selectedNodes.forEach(curNode => {
+        const otherNodes = selectedNodes.filter(n => n != curNode);
+        otherNodes.forEach(otherNode => {
+            nodes.find(n => n.name == curNode).neighbors.push(otherNode);
+        });
+    });
+    
+    drawTable();
+    drawPreview();
+    redrawEdges();
+}
+
+function exitLassoMode() {
+    
 }
 
 function enterDeleteNodeMode() {
@@ -557,6 +590,7 @@ function deleteAllNeighborsByName(name) {
 function redrawEdges() {
     if(edgeModeOn) {
         map.removeLayer(edgeLayer);
+        constructEdgesGeoJSON();
         edgeLayer.addTo(map);
         edgeLayer.bringToBack();
     }
@@ -566,13 +600,11 @@ function enterConnectNodeMode() {
     
     nodeMarkers.forEach(circle => {
         circle.on('click', connectNodeEvent);
-        console.log("1");
     });
 }
 function exitConnectNodeMode() {
     nodeMarkers.forEach(circle => {
         circle.off('click', connectNodeEvent);
-        console.log("1");
     });
 }
 

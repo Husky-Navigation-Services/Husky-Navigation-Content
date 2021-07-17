@@ -13,7 +13,6 @@
         crossorigin=""/>
         <!-- Fullscreen Plugin-->
         <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-
         <!-- Primary Stylesheets -->
         <link rel="stylesheet" href="index.css">
         <title>HNav Content</title>
@@ -75,12 +74,15 @@
                             
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
                                 <label class="btn btn-outline-warning option" for="btnradio2">Connect</label>
-                            
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                                <label class="btn btn-outline-danger option" for="btnradio3">Delete</label>
 
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
+                                <label class="btn btn-outline-warning option" for="btnradio3">Lasso Connect</label>
+                            
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                                <label class="btn btn-outline-primary option" for="btnradio4">View</label>
+                                <label class="btn btn-outline-danger option" for="btnradio4">Delete</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off">
+                                <label class="btn btn-outline-primary option" for="btnradio5">View</label>
                             </div>  
                             <button id="enforceBidir" type="button" class="btn btn-primary option" onclick="enforceBidirectionality()">Tidy Data</button>
                             
@@ -123,6 +125,7 @@
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet-lasso@2.2.4/dist/leaflet-lasso.umd.js"></script>
         <!-- Fullscreen Plugin -->
         <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
         <!-- Load primary JavaScript source code -->
