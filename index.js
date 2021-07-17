@@ -528,12 +528,15 @@ function handleEditorOptionChange() {
     }
 }
 
+var lassoControl;
+
 map.on('lasso.finished', event => {
     handleFinishedLasso(event.layers);
 });
 
 function enterLassoMode() {
-    L.control.lasso().addTo(map).enable();
+    lassoControl = L.control.lasso().addTo(map);
+    lassoControl.enable();
 }
 
 
@@ -552,6 +555,7 @@ function handleFinishedLasso(layers) {
     drawTable();
     drawPreview();
     redrawEdges();
+    document.getElementById("btnradio5").checked = true;
 }
 
 function exitLassoMode() {
