@@ -17,22 +17,32 @@
         <link rel="stylesheet" href="index.css">
         <title>HNav Content</title>
     </head>
-    
-    <div id="save-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
-      <div class="toast-body">
-        Don't forget to export your work!
-        <div class="mt-2 pt-2 border-top" >
-          <button type="button" class="btn btn-primary btn-sm" onclick="save()">Export</button>
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+    <div id="toast-div">
+      <div id="save-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
+        <div class="toast-body">
+          Don't forget to export your work!
+          <div class="mt-2 pt-2 border-top" >
+            <button type="button" class="btn btn-primary btn-sm" onclick="save()">Export</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="contributor-notice-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
-      <div class="toast-body">
-        Note: Modifying the node data from this interface will NOT modify the node data on the main website. However, contributions are welcomed! If you have any suggested additions to the current dataset, please EXPORT your work and send the data to huskynavigationfeedback@gmail.com! Thank you!
-        <div class="mt-2 pt-2 border-top" >
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+      <div id="first-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
+        <div class="toast-body">
+          Welcome to our map content toolkit! We are currently working on expanding our map data for the main website. Stay tuned for updates!
+          <div class="mt-2 pt-2 border-top" >
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+          </div>
+        </div>
+      </div>
+    
+      <div id="contributor-notice-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
+        <div class="toast-body">
+          Note: Modifying the node data from this interface will NOT modify the node data on the main website. However, contributions are welcomed! If you have any suggested additions to the current dataset, please EXPORT your work and send your data to <a href = "mailto: huskynavigationfeedback@gmail.com">this</a> email! Thank you!
+          <div class="mt-2 pt-2 border-top" >
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+          </div>
         </div>
       </div>
     </div>

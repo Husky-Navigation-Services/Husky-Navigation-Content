@@ -31,10 +31,15 @@ setInterval(function() {
     saveToast.show();
 }, 600000); 
 
+// init first toast
+var firstToastEl =document.getElementById('first-toast');
+var firstToast = new bootstrap.Toast(firstToastEl);
+firstToast.show();
+
 // init contributor notice toast
 var noticeToastEl =document.getElementById('contributor-notice-toast');
 var noticeToast = new bootstrap.Toast(noticeToastEl);
-noticeToast.show();
+ noticeToast.show();
  
 
 // init map 

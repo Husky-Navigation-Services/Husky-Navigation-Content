@@ -20,22 +20,15 @@ body {
     padding-right: 0 !important;
 }
 
-/* Save Alert */
-#save-toast {
+/* Toasts */
+#toast-div {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 5000;
-    background-color: rgba(255,255,255,1);
+    z-index: 5000;   
 }
 
-/* Notice Alert */
-
-#contributor-notice-toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 5000;
+#save-toast, #contributor-notice-toast, #first-toast {
     background-color: rgba(255,255,255,1);
 }
 
