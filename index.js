@@ -46,7 +46,7 @@ L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx
 }).addTo( map );
 
 
-/*
+
 var r = [-122.32296105, 47.64674039, -122.28707804, 47.66318327]
 var w = new L.LatLngBounds(new L.LatLng(r[1],r[0]),new L.LatLng(r[3],r[2]))
 var overlay, z, A = {
@@ -60,7 +60,7 @@ var overlay, z, A = {
 };
 z = "https://www.washington.edu/maps/wp-content/themes/maps-2014/tiles/retina/{z}/{x}/{y}.png"
 overlay = L.tileLayer(z, A);
-*/
+
 
 // MAIN
 // Update preview with Nodes.txt data,
