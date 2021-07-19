@@ -24,12 +24,18 @@ var edgeLayerGroup = L.layerGroup([]);
 var inModifyMode = false;
 var keys = []; //keys track of keys pressed for commands
 
-// init toasts
-var toastEl =document.getElementById('save-toast');//select id of toast
-var toast = new bootstrap.Toast(toastEl);//inizialize it
+// init save toast
+var saveToastEl =document.getElementById('save-toast');//select id of toast
+var saveToast = new bootstrap.Toast(saveToastEl);//inizialize it
 setInterval(function() {
-    toast.show();
+    saveToast.show();
 }, 600000); 
+
+// init contributor notice toast
+var noticeToastEl =document.getElementById('contributor-notice-toast');
+var noticeToast = new bootstrap.Toast(noticeToastEl);
+noticeToast.show();
+ 
 
 // init map 
 this.map = L.map('map', {
