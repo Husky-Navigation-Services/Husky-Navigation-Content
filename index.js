@@ -348,7 +348,7 @@ function handleNeighborChange(e) {
     // Handle bad input
     if (isBadInput) {
         e.target.style.backgroundColor = "red";
-        alert("wtf r u doin fix that input");
+        alert("Invalid input. Try again.");
         return;
     } 
     // Handle good input
