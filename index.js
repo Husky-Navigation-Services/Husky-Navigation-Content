@@ -429,7 +429,7 @@ function updatePreview() {
     }) 
     nodesTxt = res;
     drawPreview();
-    alert("Done");
+   
 }
 
 function save() {
