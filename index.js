@@ -436,7 +436,8 @@ function updatePreview() {
 function save() {
     enforceBidirectionality();
     updatePreview();
-    download("Nodes", nodesTxt.replaceAll("<br />", "%0A"));
+    download("Nodes", nodesTxt.replaceAll("<br />", "\n"));
+    noticeToast.show();
 }
 
 

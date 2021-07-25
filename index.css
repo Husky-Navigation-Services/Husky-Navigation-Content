@@ -163,8 +163,11 @@ tr {
 
 #mid-checkbox {
     margin-left: 2px;
-    margin-right: 2px;
+}
 
+#btn-check {
+    margin-left: 0px;
+    margin-right: 0px;
 }
 /*
 #content {
@@ -202,3 +205,19 @@ tr {
     text-align: center;
 }
 
+@media only screen and (max-width: 700px) {
+    #editor, #update-prev-btn, #save-btn {
+        display: none;
+    }
+
+    #map-column {
+        width: 100%;
+    }
+
+    #navbar-title, #map-options {
+        display: inline-block;
+        width: max-content;
+        margin: 0px;
+       
+    }
+}
