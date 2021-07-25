@@ -78,11 +78,10 @@ overlay = L.tileLayer(z, A);
 // Update preview with Nodes.txt data,
 // parse Nodes.txt data to update internal "nodes" variable
 // with a list of nodes.
-fetch("https://hnavcontent.azurewebsites.net/nodes.txt")
-.then(response => response.text())
-.then(txt => console.log(txt))
+function publishedInit() {
+    showControls();
 
-fetch('Nodes.txt')
+    fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
         nodesTxt = txt;
@@ -93,12 +92,67 @@ fetch('Nodes.txt')
         constructEdgesGeoJSON();
         handleCommands();
         commandLoop();
-    })
+    });
+}
 
+function init(txt) {
+    showControls();
+    nodesTxt = txt;
+    drawPreview();
+    parseNodes();
+    drawTable();
+    drawMarkers();
+    constructEdgesGeoJSON();
+    handleCommands();
+    commandLoop();
+}
+
+function showControls() {
+    const els = [
+        document.getElementById("update-prev-btn"),
+        document.getElementById("save-btn"),
+        document.getElementById("map-options"),
+        document.getElementById("editor-options"),
+        document.getElementById("editor-table-options"),
+        document.getElementById("search-input"),
+    ]
+
+    els.forEach(el => {
+        el.style.pointerEvents = "all";
+        el.style.opacity = 1;
+    })
+}
+
+function dragOverHandler(ev) {
+    ev.preventDefault();
+    console.log("dragging over");
+}
+
+function dropHandler(ev) {
+    console.log('File(s) dropped');
+
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+
+    var file = ev.dataTransfer.files[0];
+    
+    //if (file && file.kind === 'file') {
+        const reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            console.log(event);
+            console.log(event.target.result);
+            init(event.target.result);
+        };
+        console.log(file);
+        
+    //}
+
+}
     
 // Update preview of Nodes.txt with given text
 function drawPreview() {
-    previewTextEl.innerHTML = nodesTxt.replaceAll("\r\n", " <br /> ");
+    previewTextEl.innerHTML = nodesTxt.replaceAll("\n", " <br /> ");
 }
 
 // Given a string of nodes in the standard format:
@@ -115,8 +169,8 @@ function drawPreview() {
 function parseNodes() {
 
     //splits code into lines
-    var lines = nodesTxt.replaceAll("\r\n", ",").split(",");
-
+    var lines = nodesTxt.replaceAll("\n", ",").split(",");
+    console.log(lines);
 
     //finds the number of unique nodes
     var nodeCount = parseInt(lines[0]);
@@ -384,7 +438,6 @@ function handleNeighborChange(e) {
     
 
     handleEdgesCheck(btncheck2);
-
 }
 
 
@@ -436,7 +489,7 @@ function updatePreview() {
 function save() {
     enforceBidirectionality();
     updatePreview();
-    download("Nodes", nodesTxt.replaceAll("<br />", "\n"));
+    download("Nodes", nodesTxt.replaceAll("<br />", "\r\n"));
     noticeToast.show();
 }
 
