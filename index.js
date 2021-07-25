@@ -35,12 +35,14 @@ setInterval(function() {
 // init first toast
 var firstToastEl =document.getElementById('first-toast');
 var firstToast = new bootstrap.Toast(firstToastEl);
-firstToast.show();
+setTimeout(() => firstToast.show(), 2000);
+
 
 // init contributor notice toast
 var noticeToastEl =document.getElementById('contributor-notice-toast');
 var noticeToast = new bootstrap.Toast(noticeToastEl);
- noticeToast.show();
+setTimeout(() => noticeToast.show(), 3000);
+
  
 
 // init map 
