@@ -8,6 +8,7 @@ const addNodesRadio = document.getElementById("btnradio1");
 const modifyNodesRadio = document.getElementById("btnradio2");
 const lassoConnectRadio = document.getElementById("btnradio3");
 const deleteNodesRadio = document.getElementById("btnradio4");
+const moveRadio = document.getElementById("btnradio6");
 
 const viewRadio = document.getElementById("btnradio11");
 
@@ -516,27 +517,38 @@ function handleEditorOptionChange() {
         exitConnectNodeMode();
         exitDeleteNodeMode();
         exitLassoMode();
+        exitMoveMode();
         enterAddNodeMode();
     } else if (modifyNodesRadio.checked) {
         exitAddNodeMode();
         exitDeleteNodeMode();
         exitLassoMode();
+        exitMoveMode();
         enterConnectNodeMode();
     } else if (deleteNodesRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
         exitLassoMode();
+        exitMoveMode();
         enterDeleteNodeMode()
     } else if (lassoConnectRadio.checked) {
         exitConnectNodeMode();
         exitAddNodeMode();
         exitDeleteNodeMode();
+        exitMoveMode();
         enterLassoMode();
+    } else if (moveRadio.checked) {
+        exitConnectNodeMode();
+        exitAddNodeMode();
+        exitDeleteNodeMode();
+        exitLassoMode();
+        enterMoveMode();
     } else {
         exitConnectNodeMode();
         exitAddNodeMode();
         exitDeleteNodeMode();
         exitLassoMode();
+        exitMoveMode();
     }
 }
 
@@ -802,3 +814,51 @@ function handleOverlayCheck(box) {
         overlay.remove();
     }
 }
+
+/* Node Move Functions */
+
+var movingNode;
+
+// 1
+function enterMoveMode() {
+    nodeMarkers.forEach(circle => {
+        circle.on('click', moveNode)
+    });
+}
+
+// 2
+function moveNode(mdown) {
+    movingNode = mdown.target;
+    map.on('mousemove', moveNodeToNewCoords);
+    movingNode.on('click', finishNodeMove);
+}
+
+// 3
+function moveNodeToNewCoords(mmove) {
+    movingNode.setLatLng(mmove.latlng);
+}
+
+// 4
+function finishNodeMove() {
+    console.log("hello");
+    map.off('mousemove', moveNodeToNewCoords);
+    console.log(movingNode);
+    const movingNodeObj = nodes.find(n => n.name == movingNode.nodeName);
+    movingNodeObj.latitude = movingNode._latlng.lat;
+    movingNodeObj.longitude = movingNode._latlng.lng;
+    drawTable();
+    redrawEdges();
+    movingNode = null;
+}
+
+// 5
+function exitMoveMode() {
+    nodeMarkers.forEach(circle => {
+        circle.off('click', moveNode)
+    });
+}
+
+
+
+
+
