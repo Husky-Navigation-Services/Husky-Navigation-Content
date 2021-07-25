@@ -228,6 +228,16 @@ tr {
     margin-right: auto;
     margin-top: 30px;
     width: 300px;
+    font-size: 15px;
+}
+
+#dropbox-div-2 {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 240px;
+    width: 300px;
+    font-size: 15px;
 }
 
 #dropbox-icon {

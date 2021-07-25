@@ -35,13 +35,12 @@ setInterval(function() {
 // init first toast
 var firstToastEl =document.getElementById('first-toast');
 var firstToast = new bootstrap.Toast(firstToastEl);
-setTimeout(() => firstToast.show(), 2000);
+
 
 
 // init contributor notice toast
 var noticeToastEl =document.getElementById('contributor-notice-toast');
 var noticeToast = new bootstrap.Toast(noticeToastEl);
-setTimeout(() => noticeToast.show(), 3000);
 
  
 
@@ -86,19 +85,16 @@ function publishedInit() {
     fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
-        nodesTxt = txt;
-        drawPreview();
-        parseNodes();
-        drawTable();
-        drawMarkers();
-        constructEdgesGeoJSON();
-        handleCommands();
-        commandLoop();
+        initTasks(txt);
     });
 }
 
 function init(txt) {
     showControls();
+    initTasks(txt);
+}
+
+function initTasks(txt) {
     nodesTxt = txt;
     drawPreview();
     parseNodes();
@@ -107,6 +103,9 @@ function init(txt) {
     constructEdgesGeoJSON();
     handleCommands();
     commandLoop();
+
+    setTimeout(() => firstToast.show(), 2000);
+    setTimeout(() => noticeToast.show(), 3000);
 }
 
 function showControls() {
@@ -123,6 +122,9 @@ function showControls() {
         el.style.pointerEvents = "all";
         el.style.opacity = 1;
     })
+
+    document.getElementById("dropbox-div").style.display = "none";
+    document.getElementById("dropbox-div-2").style.display = "none";
 }
 
 function dragOverHandler(ev) {
