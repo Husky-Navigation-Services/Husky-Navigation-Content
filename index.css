@@ -257,6 +257,7 @@ tr {
     color: gray;
     text-decoration: underline;
     cursor: pointer;
+    font-size: 20px;
 }
 
 #default-source:hover {
