@@ -873,7 +873,7 @@ function handleOverlayCheck(box) {
     }
 }
 
-/* Node Move Functions */
+/* Node Modification Functions */
 
 var movingNode;
 
@@ -915,8 +915,3 @@ function exitMoveMode() {
         circle.off('click', moveNode)
     });
 }
-
-
-
-
-
