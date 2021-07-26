@@ -9,7 +9,10 @@
 body {
     height: 100%;
     width: 100%;
-    overflow-y: hidden;
+}
+
+html, body {
+    overflow: hidden;
 }
 
 
@@ -252,11 +255,12 @@ tr {
     margin-right: auto;
     padding: 175px;
     padding-top: 100px;
+    padding-bottom: 0px;
     width: 300px;
     font-size: 17px;
     word-break: keep-all;
     width: 100%;
-    height: 100%;
+    height: 500px;
     text-align: justify;
 }
 
