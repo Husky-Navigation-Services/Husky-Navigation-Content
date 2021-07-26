@@ -490,14 +490,14 @@ function save() {
     //noticeToast.show();
 }
 
-// add hashCode method to String constructor's prototype
+// Add hashCode method to String constructor's prototype
 String.prototype.hashCode = function() {
     var hash = 0, i, chr;
     if (this.length === 0) return hash;
     for (i = 0; i < this.length; i++) {
       chr   = this.charCodeAt(i);
       hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0; // Convert to 32 bit integer
     }
     return hash;
 };
@@ -507,7 +507,7 @@ function send() {
     const updateID = Math.abs(Math.random().toString().hashCode());
     console.log(updateID);
     Email.send({
-        SecureToken : "43eb7cdf-90cc-489b-b77a-4b94117cf958",
+        SecureToken : "f85da77a-fa6c-4875-9419-168a82b2350a",
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
         Subject : "Husky Navigation Content Update" + updateID + " [" + date.toString() + "]",
