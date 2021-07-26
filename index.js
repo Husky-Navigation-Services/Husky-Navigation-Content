@@ -112,6 +112,7 @@ function showControls() {
     const els = [
         document.getElementById("update-prev-btn"),
         document.getElementById("save-btn"),
+        document.getElementById("send-btn"),
         document.getElementById("map-options"),
         document.getElementById("editor-options"),
         document.getElementById("editor-table-options"),
@@ -179,9 +180,6 @@ function parseNodes() {
 
     //finds the number of unique nodes
     var nodeCount = parseInt(lines[0]);
-    
-    
-
 
     //creates all nodes without paths to other nodes
     for(i = 1; i <= nodeCount; i++) {
@@ -498,8 +496,21 @@ function save() {
     //noticeToast.show();
 }
 
-
-
+function send() {
+    Email.send({
+        SecureToken : "43eb7cdf-90cc-489b-b77a-4b94117cf958",
+        To : 'huskynavigationfeedback@gmail.com',
+        From : "huskynavigationfeedback@gmail.com",
+        Subject : "Husky Navigation Content Update [" + new Date() + "]",
+        Body : "Attached is a updated copy of Nodes.txt.",
+        Attachments: [{
+            name: "Nodex.txt",
+            path: "Nodes.txt"
+        }]
+    }).then(
+        alert("Content sent successfully to Husky Navigation Services team!")
+    );
+}
 
 var circleArray = [];
 var nodesToAdd = [];

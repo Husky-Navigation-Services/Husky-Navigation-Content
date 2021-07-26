@@ -75,8 +75,15 @@ body {
 #save-btn {
     float: right;
     margin-right: 5px;
+    margin-left: 0px;
+}
+
+#send-btn {
+    float: right;
+    margin-right: 5px;
     margin-left: 5px;
 }
+
 /* Nodes Editor */
 #editor-title {
     display: inline;
@@ -207,7 +214,7 @@ tr {
 }
 
 @media only screen and (max-width: 700px) {
-    #editor, #update-prev-btn, #save-btn {
+    #editor, #update-prev-btn, #save-btn, #send-btn {
         display: none;
     }
 
@@ -293,7 +300,7 @@ tr {
     opacity: 0.8;
 }
 
-#update-prev-btn, #save-btn, #map-options, #editor-options, #editor-table-options, #search-input {
+#update-prev-btn, #save-btn, #send-btn, #map-options, #editor-options, #editor-table-options, #search-input {
     pointer-events: none;
     opacity: 0.6;
 }
