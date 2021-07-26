@@ -490,9 +490,21 @@ function save() {
     //noticeToast.show();
 }
 
+// add hashCode method to String constructor's prototype
+String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
+
 function send() {
     const date = new Date();
-    const updateID = date.toString().hashCode();
+    const updateID = Math.abs(Math.random().toString().hashCode());
     console.log(updateID);
     Email.send({
         SecureToken : "43eb7cdf-90cc-489b-b77a-4b94117cf958",
@@ -508,6 +520,8 @@ function send() {
         alert("Content sent successfully to Husky Navigation Services team! Your content update ID is " + updateID)
     );
 }
+
+
 
 var circleArray = [];
 var nodesToAdd = [];
