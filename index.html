@@ -27,24 +27,6 @@
           </div>
         </div>
       </div>
-
-      <div id="first-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
-        <div class="toast-body">
-          Welcome to our map content toolkit! We are currently working on expanding our map data for the main website. Stay tuned for updates!
-          <div class="mt-2 pt-2 border-top" >
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
-          </div>
-        </div>
-      </div>
-    
-      <div id="contributor-notice-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" data-bs-delay="30000" data-bs-animation="true">
-        <div class="toast-body">
-          Note: Modifying the node data from this interface will NOT modify the node data on the main website. However, contributions are welcomed! If you have any suggested additions to the current dataset, please EXPORT your work and send your data to <a href = "mailto: huskynavigationfeedback@gmail.com">this</a> email! Thank you!
-          <div class="mt-2 pt-2 border-top" >
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <body>
@@ -61,8 +43,10 @@
                     <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off" onclick="handleOverlayCheck(this)">
                     <label class="btn btn-outline-light" for="btncheck3">Show Overlay</label>
 
+                    <!-- 
                     <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" onclick="handlePopupCheck(this)">
-                    <label class="btn btn-outline-light" for="btncheck1">Show Popups</label>
+                    <label class="btn btn-outline-light" for="btncheck1">Show Popups</label> 
+                    -->
 
                 </div>
         </nav>
@@ -98,9 +82,6 @@
                             <div id="editor-options" class="btn-group" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorOptionChange()">
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
                                 <label class="btn btn-outline-success option" for="btnradio1">Add</label>
-                            
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio6" autocomplete="off">
-                                <label class="btn btn-outline-success option" for="btnradio6">Move</label>
 
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
                                 <label class="btn btn-outline-warning option" for="btnradio2">Connect</label>
@@ -110,6 +91,9 @@
 
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
                                 <label class="btn btn-outline-danger option" for="btnradio4">Delete</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio6" autocomplete="off">
+                                <label id="btnradio6-label" class="btn btn-outline-light option" for="btnradio6">Move</label>
 
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off">
                                 <label class="btn btn-outline-primary option" for="btnradio5">View</label>
@@ -133,7 +117,7 @@
                       
                       <hr>
                       <div id="table-wrapper">
-                        <table id="nodes-table" class="table table-dark fixed" >
+                        <table id="nodes-table" class="table table-dark fixed">
                             <thead>
                               <tr>
                                 <th scope="col" style="width: 100px;">Id</th>
@@ -154,9 +138,9 @@
                             text file to this <a href = "mailto: huskynavigationfeedback@gmail.com">email address</address></a>.
                             From the entire Husky Navigation Serivces team, thank you!
                           </p>
-                          <p class="dropbox-text">To begin, please <b>drag and drop</b> your node data from a previous session, </ br> or select the latest node data.</p>
+                          <p class="dropbox-text">To begin, please <b>drag and drop</b> your node data from a previous session, </ br> or continue with the latest node data.</p>
                           <img id="dropbox-icon-2" class="dropbox-icon" src="./Icons/Dropbox_Icon.png" alt="Italian Trulli">
-                          <p class="default-source" onclick="publishedInit()">Latest Node Data</p>
+                          <p class="default-source" onclick="init('', true)">Continue With Latest Node Data</p>
                         </div>
                     </div>
                   </div>

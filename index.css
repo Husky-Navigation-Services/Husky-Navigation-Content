@@ -139,8 +139,9 @@ body {
 td { 
     width: 100px;
     height: 50px;
-    
-   
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 tr {
@@ -250,7 +251,7 @@ tr {
     margin-left: auto;
     margin-right: auto;
     padding: 175px;
-    padding-top: 150px;
+    padding-top: 100px;
     width: 300px;
     font-size: 17px;
     word-break: keep-all;
@@ -300,7 +301,18 @@ tr {
     opacity: 0.8;
 }
 
-#update-prev-btn, #save-btn, #send-btn, #map-options, #editor-options, #editor-table-options, #search-input {
+#update-prev-btn, #save-btn, #send-btn, #editor-options, #editor-table-options, #search-input {
     pointer-events: none;
     opacity: 0.6;
 }
+
+#btnradio6-label {
+    color: rgb(212, 110, 212);
+    border-color:rgb(212, 110, 212);
+}
+
+#btnradio6-label:hover {
+    color: white;
+    background-color:rgb(212, 110, 212);
+}
+

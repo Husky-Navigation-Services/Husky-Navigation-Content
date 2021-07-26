@@ -32,15 +32,6 @@ setInterval(function() {
     saveToast.show();
 }, 600000); 
 
-// init first toast
-var firstToastEl =document.getElementById('first-toast');
-var firstToast = new bootstrap.Toast(firstToastEl);
-
-
-
-// init contributor notice toast
-var noticeToastEl =document.getElementById('contributor-notice-toast');
-var noticeToast = new bootstrap.Toast(noticeToastEl);
 
  
 
@@ -76,36 +67,41 @@ overlay = L.tileLayer(z, A);
 
 
 // MAIN
-// Update preview with Nodes.txt data,
-// parse Nodes.txt data to update internal "nodes" variable
-// with a list of nodes.
-function publishedInit() {
-    showControls();
 
-    fetch('Nodes.txt')
+// fetch latest data, parse data, draw map markers
+fetch('Nodes.txt')
     .then(response => response.text())
     .then(txt => {
-        initTasks(txt);
+        startup(txt);
     });
-}
 
-function init(txt) {
-    showControls();
-    initTasks(txt);
-}
-
-function initTasks(txt) {
+// parse given data, draw map markers
+function startup(txt) {
     nodesTxt = txt;
-    drawPreview();
     parseNodes();
-    drawTable();
     drawMarkers();
     constructEdgesGeoJSON();
-    handleCommands();
-    commandLoop();
+}
 
-    //setTimeout(() => firstToast.show(), 2000);
-    //setTimeout(() => noticeToast.show(), 3000);
+// if continuing with latest data: show controls, draw preview, draw table, begin command loop
+// otherwise: show controls, parse nodes, draw table, draw map markers, construct edges, begin command loop
+function init(txt, isLatestData) {
+    showControls();
+    if (isLatestData) {
+        drawPreview();
+        drawTable();
+        handleCommands();
+        commandLoop();
+    } else {
+        nodesTxt = txt;
+        drawPreview();
+        parseNodes();
+        drawTable();
+        drawMarkers();
+        constructEdgesGeoJSON();
+        handleCommands();
+        commandLoop();
+    }
 }
 
 function showControls() {
@@ -148,7 +144,7 @@ function dropHandler(ev) {
         reader.onload = function(event) {
             console.log(event);
             console.log(event.target.result);
-            init(event.target.result);
+            init(event.target.result, false);
         };
         console.log(file);
         
@@ -238,8 +234,6 @@ function drawTable() {
     tableContentRows.forEach(row => row.remove());
     nodes.forEach(node => {
         const row = nodesTable.insertRow();
-        tableContentRows.push(row);
-
         if (inModifyMode) {
             // Set cell content for name as text input
             var cell = row.insertCell();
@@ -271,7 +265,7 @@ function drawTable() {
                 cell.innerHTML = node[i];
             });
         }   
-
+        tableContentRows.push(row);
     })
 }
 
@@ -497,7 +491,7 @@ function save() {
 }
 
 function send() {
-    Email.send({
+    window.Email.send({
         SecureToken : "43eb7cdf-90cc-489b-b77a-4b94117cf958",
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
