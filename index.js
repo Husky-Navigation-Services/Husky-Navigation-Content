@@ -513,8 +513,8 @@ function send() {
         Subject : "Husky Navigation Content Update" + updateID + " [" + date.toString() + "]",
         Body : "Attached is a updated copy of Nodes.txt.",
         Attachments: [{
-            name: "Nodes.txt",
-            path: "Nodes.txt"
+            name : "Nodes.txt",
+            path : "https://hnavcontent.azurewebsites.net/Nodes.txt"
         }]
     }).then(
         alert("Content sent successfully to Husky Navigation Services team! Your content update ID is " + updateID)
