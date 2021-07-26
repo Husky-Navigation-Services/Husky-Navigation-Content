@@ -507,7 +507,7 @@ function send() {
     const updateID = Math.abs(Math.random().toString().hashCode());
     console.log(updateID);
     Email.send({
-        SecureToken : "f85da77a-fa6c-4875-9419-168a82b2350a",
+        SecureToken : "32efe576-e4a4-4992-aef5-8feab30195a0",
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
         Subject : "Husky Navigation Content Update" + updateID + " [" + date.toString() + "]",
