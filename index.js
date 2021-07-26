@@ -491,14 +491,14 @@ function save() {
 }
 
 function send() {
-    window.Email.send({
+    Email.send({
         SecureToken : "43eb7cdf-90cc-489b-b77a-4b94117cf958",
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
         Subject : "Husky Navigation Content Update [" + new Date() + "]",
         Body : "Attached is a updated copy of Nodes.txt.",
         Attachments: [{
-            name: "Nodex.txt",
+            name: "Nodes.txt",
             path: "Nodes.txt"
         }]
     }).then(
