@@ -120,7 +120,7 @@ function showControls() {
         el.style.opacity = 1;
     })
 
-    document.getElementById("dropbox-div").style.display = "none";
+    document.getElementById("preview-fill-text").style.display = "none";
     document.getElementById("dropbox-div-2").style.display = "none";
 }
 

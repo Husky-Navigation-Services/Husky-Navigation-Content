@@ -65,6 +65,7 @@ html, body {
     height: calc(100% - 94.5px);
     overflow-y: scroll;
     font-size: 15px;
+    position: relative;
 }
 
 #preview-title {
@@ -239,14 +240,16 @@ tr {
     height: 100%;
 }
 
-#dropbox-div {
+.preview-fill-text {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 30px;
-    width: 296px;
-    font-size: 15px;
-    text-align: justify;
+    position: absolute;
+    width: 285px;
+    height:max-content;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    
 }
 
 #dropbox-div-2 {
@@ -284,9 +287,6 @@ tr {
   100% {transform: rotate(0deg)}
 }
 
-.dropbox-text {
-    color: gray;
-}
 
 .dropbox-text-wide {
     color: gray;
