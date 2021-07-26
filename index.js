@@ -129,6 +129,7 @@ function showControls() {
 
 function dragOverHandler(ev) {
     ev.preventDefault();
+    document.getElementById("dropbox-icon-2").style.animation = "none";
     console.log("dragging over");
 }
 

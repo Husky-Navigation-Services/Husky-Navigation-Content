@@ -258,7 +258,18 @@ tr {
     margin-left: auto;
     margin-right: auto;
     height: 50px;
-    
+    transition: 0.2s;
+    animation: jiggleDropbox 2s infinite;
+}
+
+@keyframes jiggleDropbox {
+  0% {transform: rotate(0deg)}
+  30% {transform: rotate(0deg)}
+  40% {transform: rotate(20deg)}
+  50% {transform: rotate(-20deg)}
+  60% {transform: rotate(20deg)}
+  70% {transform: rotate(0deg)}
+  100% {transform: rotate(0deg)}
 }
 
 .dropbox-text {
