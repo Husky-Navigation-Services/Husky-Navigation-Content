@@ -233,6 +233,14 @@ tr {
         margin: 0px;
        
     }
+
+    #preview-text {
+        height: calc(100% - 64.5px);
+    }
+
+    #preview {
+        height: calc(40vh - 90.75px);
+    }
 }
 
 #big-dropbox-wrapper {
@@ -240,16 +248,17 @@ tr {
     height: 100%;
 }
 
-.preview-fill-text {
+#preview-fill-text {
     display: block;
     position: absolute;
     width: 285px;
-    height:max-content;
+    height: min-content;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    
+    margin: 0px;
+    z-index: 1000;
 }
 
 #dropbox-div-2 {
