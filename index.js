@@ -104,8 +104,8 @@ function initTasks(txt) {
     handleCommands();
     commandLoop();
 
-    setTimeout(() => firstToast.show(), 2000);
-    setTimeout(() => noticeToast.show(), 3000);
+    //setTimeout(() => firstToast.show(), 2000);
+    //setTimeout(() => noticeToast.show(), 3000);
 }
 
 function showControls() {
@@ -494,7 +494,7 @@ function save() {
     enforceBidirectionality();
     updatePreview();
     download("Nodes", nodesTxt.replaceAll("<br />", "\r\n"));
-    noticeToast.show();
+    //noticeToast.show();
 }
 
 
