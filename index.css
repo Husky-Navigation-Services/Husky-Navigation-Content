@@ -240,7 +240,7 @@ tr {
     font-size: 15px;
 }
 
-#dropbox-icon {
+.dropbox-icon {
     
     margin-left: 125px;
     width: 50px;
@@ -248,11 +248,11 @@ tr {
     
 }
 
-#dropbox-text {
+.dropbox-text {
     color: gray;
 }
 
-#default-source {
+.default-source {
     text-align: center;
     color: gray;
     text-decoration: underline;
@@ -260,7 +260,7 @@ tr {
     font-size: 20px;
 }
 
-#default-source:hover {
+.default-source:hover {
     opacity: 0.8;
 }
 
