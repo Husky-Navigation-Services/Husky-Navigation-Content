@@ -510,7 +510,7 @@ function send() {
         SecureToken : "39cb680d-bccd-4638-bba9-e5ef37744657",
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
-        Subject : "Husky Navigation Content Update" + updateID + " [" + date.toString() + "]",
+        Subject : "Content Update " + updateID + " [" + date.toString() + "]",
         Body : "Attached is a updated copy of Nodes.txt.",
         Attachments: [{
             name : "Nodes.txt",
