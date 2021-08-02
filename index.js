@@ -511,7 +511,7 @@ function send() {
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
         Subject : "Content Update " + updateID + " [" + date.toString() + "]",
-        Body : "Attached is a updated copy of Nodes.txt.",
+        Body : "Attached is a updated copy of Nodes.txt:\n" + nodesTxt.replaceAll("\n", " <br /> "),
         Attachments: [{
             name : "Nodes.txt",
             path : "https://hnavcontent.azurewebsites.net/Nodes.txt"
