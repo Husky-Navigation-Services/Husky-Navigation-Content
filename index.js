@@ -511,11 +511,14 @@ function send() {
         To : 'huskynavigationfeedback@gmail.com',
         From : "huskynavigationfeedback@gmail.com",
         Subject : "Content Update " + updateID + " [" + date.toString() + "]",
-        Body : "Attached is a updated copy of Nodes.txt:\n" + nodesTxt.replaceAll("\n", " <br /> "),
+        Body : nodesTxt.replaceAll("\n", " <br /> "),
+        // "Attached is a updated copy of Nodes.txt:\n" + 
+        /*
         Attachments: [{
             name : "Nodes.txt",
             path : "https://hnavcontent.azurewebsites.net/Nodes.txt"
         }]
+        */
     }).then(
         alert("Content sent successfully to Husky Navigation Services team! Your content update ID is " + updateID)
     );
