@@ -503,6 +503,8 @@ String.prototype.hashCode = function() {
 };
 
 function send() {
+    enforceBidirectionality();
+    updatePreview();
     const date = new Date();
     const updateID = Math.abs(Math.random().toString().hashCode());
     console.log(updateID);
