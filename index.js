@@ -645,21 +645,22 @@ function exitDeleteNodeMode() {
 }
 
 function deleteNodeEvent(e) {
-    map.removeLayer(e.target);
-    nodes = nodes.filter(n => n.name != e.target.nodeName);
-    deleteAllNeighborsByName(e.target.nodeName);
+    const n = e.target;
+    const id = n.nodeId;
+    const neighs = nodes.get(id).neighbors;
+    map.removeLayer(n);
+
+    // clear connections
+    neighs.forEach(n => {
+        nodes.get(n).neighbors.delete(id);
+    });
+
+    nodes.delete(id);
     drawTable();
     constructEdgesGeoJSON();
     handleEdgesCheck(btncheck2);
-    enterDeleteNodeMode(); // to re-attatch event listeners to the newly-generated markers
-
 }
 
-function deleteAllNeighborsByName(name) {
-    nodes.forEach(node => {
-        node.neighbors = node.neighbors.filter(neigh => neigh != name);
-    })
-}
 
 function redrawEdges() {
     if (edgeModeOn) {
