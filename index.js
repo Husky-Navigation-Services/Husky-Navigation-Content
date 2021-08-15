@@ -269,7 +269,7 @@ function drawMarkers() {
             closeButton: true
         }).setContent("<small>" + props.name + "</small>")
         circle.bindPopup(popup);
-        circle.nodeId = props.id; // custom property
+        circle.nodeId = id; // custom property
         nodeMarkers.push(circle);
     }
 }
@@ -670,7 +670,6 @@ function redrawEdges() {
 }
 
 function enterConnectNodeMode() {
-
     nodeMarkers.forEach(circle => {
         circle.on('click', connectNodeEvent);
     });
@@ -682,27 +681,20 @@ function exitConnectNodeMode() {
     });
 }
 
-var firstCircle = null;
+var firstId;
 
 function connectNodeEvent(e) {
-    var clickedCircle = e.target;
-    if (!firstCircle) {
-        firstCircle = clickedCircle.nodeName;
+    const clickedId = e.target.nodeId;
+    if (!firstId) {
+        firstId = clickedId;
     } else {
-        var firstNode = nodes.find(n => n.name == firstCircle);
-        var secondNode = nodes.find(n => n.name == clickedCircle.nodeName);
-        if (!firstNode.neighbors.includes(secondNode.name)) {
-            firstNode.neighbors.push(secondNode.name);
-            secondNode.neighbors.push(firstNode.name);
-        } else {
-            alert("Stop adding duplicate connections!");
-        }
-        firstCircle = null;
+        nodes.get(firstId).neighbors.add(clickedId);
+        nodes.get(clickedId).neighbors.add(firstId);
+        firstId = undefined;
         drawTable();
         constructEdgesGeoJSON();
         redrawEdges();
     }
-
 }
 
 function handleEditorTableOptionChange() {
