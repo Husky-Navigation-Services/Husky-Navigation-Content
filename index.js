@@ -15,7 +15,7 @@ const viewRadio = document.getElementById("btnradio11");
 const page = document.getElementById("page");
 const deleteForm = document.getElementById("delete-container");
 var nodesTxt; // unparsed node text
-var nodes = []; // parsed list of node objects for internal representation
+var nodes = new Map(); // parsed list of node objects for internal representation
 var ogNodes = []; // makes sure undo doesn't go past this
 var prevNodes = [
     []
@@ -173,60 +173,28 @@ function drawPreview() {
 //        neighbors [array of neighbor node names]
 //    }
 function parseNodes() {
-
-    //splits code into lines
-    var lines = nodesTxt.replaceAll("\n", ",").split(",");
-    console.log(lines);
-
-    //finds the number of unique nodes
-    var nodeCount = parseInt(lines[0]);
-
-    //creates all nodes without paths to other nodes
-    for (i = 1; i <= nodeCount; i++) {
-        let nodeElements = lines[i].split(" ");
-        console.log(nodes.find(n => n.id == nodeElements[0]));
-        nodes.push({
-            //'id' now refers to the ID in the text file
-            //old 'id' property renamed as 'name'
-            id: nodeElements[0],
-            name: nodeElements[3],
-            latitude: nodeElements[1],
-            longitude: nodeElements[2],
-            //filled in later
-            neighbors: null
-        })
+    let lines = nodesTxt.replaceAll("\n", ",").split(",");
+    let nodeCount = parseInt(lines.shift());
+    // construct nodes
+    for (let i = 0; i < nodeCount; i++) {
+        let els = lines.shift().split(" ");
+        let [id, lat, lon, name, neighs] = [els[0], els[1], els[2], els[3].toString(), new Set()];
+        nodes.set(id, {
+            name: name.replace('\r', ''),
+            latitude: lat,
+            longitude: lon,
+            neighbors: neighs
+        });
     }
 
-    //loops over the rest of the file to find node paths
-    for (i = 1 + nodeCount; lines[i]; ++i) {
-        let nodeElements = lines[i].split(" ");
-
-        //first element is the node that 
-        //everything else in the line connects to
-        var node =
-            nodes.find(node => node.id == nodeElements[0]);
-        var neighborsList = [];
-
-        //loops over all neighboring nodes
-        for (j = 1; nodeElements[j]; ++j) {
-            var neighbor =
-                nodes.find(node => node.id == nodeElements[j]);
-
-            //adds only neighbor name to the neighbor list
-            if (neighbor) {
-                neighborsList.push(neighbor.name);
-            }
-
-        }
-
-        if (node) {
-            node.neighbors = neighborsList;
-        }
-
+    // construct node paths
+    for (let i = 0; i < nodeCount; i++) {
+        let els = lines.shift().split(" ");
+        let [node, neighs] = [nodes.get(els.shift()), els];
+        neighs.forEach(neigh => {
+            node.neighbors.add(neigh.replace('\r', ''));
+        });
     }
-
-    ogNodes = nodes;
-
 }
 
 
@@ -234,41 +202,31 @@ function parseNodes() {
 function drawTable() {
     // remove all existing content rows
     tableContentRows.forEach(row => row.remove());
-    nodes.forEach(node => {
+    for (const [id, props] of nodes) {
         const row = nodesTable.insertRow();
+        const [c1, c2, c3, c4] = [0, 0, 0, 0].map(el => row.insertCell());
+        const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
+        const neighsIterator = props.neighbors.values();
+        const neighs = [...neighsIterator].map(id => " " + nodes.get(id).name);
+        console.log(neighs);
         if (inModifyMode) {
-            // Set cell content for name as text input
-            var cell = row.insertCell();
+            // Add NAME input cell
             const inputNameBox = document.createElement("input");
-            inputNameBox.id = node["id"];
+            inputNameBox.id = id;
             inputNameBox.class = "form-control";
-            inputNameBox.value = node["name"].toString().replaceAll(",", ", ");
+            inputNameBox.value = name.replaceAll(",", ", ");
             inputNameBox.addEventListener("change", handleNameChange);
-            cell.appendChild(inputNameBox);
-            // Set cell content for lat, long
-            const cells = ["latitude", "longitude"];
-            cells.forEach(i => {
-                cell = row.insertCell();
-                cell.innerHTML = node[i];
-            });
-            // Set cell content for neighbors as text input
-            cell = row.insertCell();
-            const inputNeighborsBox = document.createElement("input");
-            inputNeighborsBox.id = node["id"];
-            inputNeighborsBox.class = "form-control";
-            inputNeighborsBox.value = node["neighbors"].toString().replaceAll(",", ", ");
-            inputNeighborsBox.addEventListener("change", handleNeighborChange);
-            cell.appendChild(inputNeighborsBox);
+            c1.appendChild(inputNameBox);
         } else {
-            // Set cell content for name, lat, long, neighbors
-            const cells = ["name", "latitude", "longitude", "neighbors"];
-            cells.forEach(i => {
-                cell = row.insertCell();
-                cell.innerHTML = node[i];
-            });
+            c1.innerHTML = name;
         }
+
+        c2.innerHTML = lat;
+        c3.innerHTML = lon;
+        c4.innerHTML = neighs;
+
         tableContentRows.push(row);
-    })
+    }
 }
 
 function handleNameChange(e) {
@@ -297,11 +255,9 @@ function handleNameChange(e) {
 function drawMarkers() {
     nodeMarkers.forEach(m => {
         map.removeLayer(m);
-    })
-    nodeMarkers = [];
-    console.log(nodes.length);
-    nodes.forEach(node => {
-        const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
+    });
+    for (const [id, props] of nodes) {
+        const circle = L.circle([parseFloat(props.latitude), parseFloat(props.longitude)], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 1,
@@ -311,11 +267,11 @@ function drawMarkers() {
             closeOnClick: true,
             autoClose: false,
             closeButton: true
-        }).setContent("<small>" + node.name + "</small>")
+        }).setContent("<small>" + props.name + "</small>")
         circle.bindPopup(popup);
-        circle.nodeName = node.name; // custom property
+        circle.nodeId = props.id; // custom property
         nodeMarkers.push(circle);
-    })
+    }
 }
 
 function handlePopupCheck(box) {
@@ -358,10 +314,12 @@ function constructEdgesGeoJSON() {
         "type": "FeatureCollection",
         "features": []
     };
-    nodes.forEach(node => {
-        node.neighbors.forEach(neigh => {
-            const nodeCoord = [parseFloat(node.longitude), parseFloat(node.latitude)];
-            const neighNode = nodes.find(n => n.name == neigh);
+    for (const [id, props] of nodes) {
+        props.neighbors.forEach(neigh => {
+            console.log(neigh);
+            const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
+            const neighNode = nodes.get(neigh);
+            console.log(neighNode);
             const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
             data.features.push({
                 "type": "Feature",
@@ -372,15 +330,9 @@ function constructEdgesGeoJSON() {
                 }
             })
         })
-    });
-
-    edgeLayer = L.geoJSON(data);
-    try {
-        edgeLayerGroup.addLayer(edgeLayer);
-    } catch (ignore) {
-
     }
-
+    edgeLayer = L.geoJSON(data);
+    edgeLayerGroup.addLayer(edgeLayer);
 }
 
 
@@ -471,15 +423,15 @@ function enforceBidirectionality(displayMessage) {
 function updatePreview() {
     var res = "";
     // write # of nodes to first line
-    res += nodes.length + "<br />";
+    res += nodes.size + "<br />";
     // write each node id/lat/long/name to first half
-    nodes.forEach(node => {
-        res += node.id + " " + node.latitude + " " + node.longitude + " " + node.name + "<br />";
-    });
+    for (const [id, props] of nodes) {
+        res += id + " " + props.latitude + " " + props.longitude + " " + props.name + "<br />";
+    }
     // write each node id/neigh1/neigh2/etc. to second half
-    nodes.forEach(node => {
-        res += node.id + " " + node.neighbors.map(neighbor => nodes.find(n => n.name == neighbor).id).toString().replaceAll("[", "").replaceAll("]", "").replaceAll(",", " ") + "<br />";
-    })
+    for (const [id, props] of nodes) {
+        res += id + " " + Array.from(props.neighbors).toString().replaceAll(',', ' ') + "<br />";
+    }
     nodesTxt = res;
     drawPreview();
 
@@ -530,74 +482,79 @@ function send() {
 
 
 
-var circleArray = [];
-var nodesToAdd = [];
-var addedNodes = 0;
-var nameOffset = 0;
+let addedMarkers = [];
+let nodesToAdd = new Map();
+let lastAddedId;
 
 function nodeEvent(e) {
-    var pos = e.latlng;
+    const pos = e.latlng;
+    const numNodes = nodes.size;
+    let newId = lastAddedId ? lastAddedId + 1 : numNodes + 1;
 
-    if (nodesToAdd[nodesToAdd.length - 1]) {
-        var neighbor = nodesToAdd[nodesToAdd.length - 1].name;
+    // ensure newId is unique
+    while (nodes.has(newId)) {
+        newId++;
     }
+    lastAddedId = newId;
 
-    // checks for duplicate names or IDs and corrects
-    while (nodes.find(n => n.id == parseInt(nodes.length + addedNodes + nameOffset + 1)) ||
-        nodes.find(n => n.name == ['N' + (parseInt(nodes.length) +
-            parseInt(nameOffset) + 1)])) {
-        nameOffset++;
-    }
+    // add new node
+    nodesToAdd.set(newId, {
+        name: 'N' + newId,
+        latitude: pos.lat,
+        longitude: pos.lng,
+        neighbors: new Set()
+    });
 
-    if (neighbor) {
-        nodesToAdd.push({
-            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
-            name: 'N' + (parseInt(nodes.length) +
-                parseInt(nameOffset) + 1),
-            latitude: pos.lat,
-            longitude: pos.lng,
-            neighbors: [neighbor]
-        });
-    } else {
-        nodesToAdd.push({
-            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
-            name: 'N' + (parseInt(nodes.length) +
-                parseInt(nameOffset) + 1),
-            latitude: pos.lat,
-            longitude: pos.lng,
-            neighbors: []
-        });
-    }
-
-    addedNodes++;
-    nameOffset++;
-
-    const circle = L.circle(pos, {
+    // add new markers
+    addedMarkers.push(L.circle(pos, {
         color: 'green',
         fillColor: 'green',
         fillOpacity: 1,
         radius: 3
-    }).addTo(map);
-
-    circleArray.push(circle);
+    }).addTo(map));
 }
 
-//useless, but may be used for more functionality later
+// Enter "Add" mode
 function enterAddNodeMode() {
     map.on('click', nodeEvent);
 }
 
+// Exits "Add" mode. Updates nodes and redraws.
 function exitAddNodeMode() {
     map.off('click', nodeEvent);
-
-
     prevNodes.push(nodes);
 
-    nodes = nodes.concat(nodesToAdd);
+    // add neighbors to nodesToAdd
+    let prevId;
+    for (const [id, props] of nodesToAdd) {
+        if (prevId) {
+            props.neighbors.add(prevId);
+            nodesToAdd.get(prevId).neighbors.add(id);
+        }
+        prevId = id;
+    }
 
-    drawNodeElements();
+    // concat existing nodes with nodesToAdd
+    for (const [id, props] of nodesToAdd) {
+        nodes.set(id, props);
+    }
 
-    nodesToAdd = [];
+    // remove temporary added circles
+    addedMarkers.forEach(marker => {
+        map.removeLayer(marker);
+    });
+
+    // redraw
+    drawTable();
+    drawMarkers();
+    constructEdgesGeoJSON();
+    redrawEdges();
+    handleEdgesCheck(btncheck2);
+
+    // cleanup
+    nodesToAdd = new Map();
+    lastAddedId = undefined;
+    offset = 0;
 }
 
 function handleEditorOptionChange() {
@@ -850,24 +807,6 @@ function handleRedo() {
         drawNodeElements();
     }
 
-}
-
-//quick way to redraw nodes
-function drawNodeElements() {
-
-    circleArray.forEach(circle => {
-        map.removeLayer(circle);
-    });
-
-    drawTable();
-    drawMarkers();
-
-    enforceBidirectionality(false);
-    constructEdgesGeoJSON();
-
-    redrawEdges()
-
-    handleEdgesCheck(btncheck2);
 }
 
 function isSameArrayByElems(ar1, ar2) {
