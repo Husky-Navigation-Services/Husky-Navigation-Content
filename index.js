@@ -830,9 +830,9 @@ function handleOverlayCheck(box) {
     }
 }
 
-/* Node Modification Functions */
+/* Node Moving Functions */
 
-var movingNode;
+let movingNode;
 
 // 1
 function enterMoveMode() {
@@ -842,25 +842,23 @@ function enterMoveMode() {
 }
 
 // 2
-function moveNode(mdown) {
-    movingNode = mdown.target;
+function moveNode(click) {
+    movingNode = click.target;
     map.on('mousemove', moveNodeToNewCoords);
     movingNode.on('click', finishNodeMove);
 }
 
 // 3
-function moveNodeToNewCoords(mmove) {
-    movingNode.setLatLng(mmove.latlng);
+function moveNodeToNewCoords(move) {
+    movingNode.setLatLng(move.latlng);
 }
 
 // 4
 function finishNodeMove() {
-    console.log("hello");
     map.off('mousemove', moveNodeToNewCoords);
-    console.log(movingNode);
-    const movingNodeObj = nodes.find(n => n.name == movingNode.nodeName);
-    movingNodeObj.latitude = movingNode._latlng.lat;
-    movingNodeObj.longitude = movingNode._latlng.lng;
+    const movingNodeProps = nodes.get(movingNode.nodeId);
+    movingNodeProps.latitude = movingNode.getLatLng().lat;
+    movingNodeProps.longitude = movingNode.getLatLng().lng;
     drawTable();
     redrawEdges();
     movingNode = null;
