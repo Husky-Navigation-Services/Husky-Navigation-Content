@@ -612,12 +612,13 @@ function enterLassoMode() {
 function handleFinishedLasso(layers) {
     const selectedNodes = [];
     layers.forEach(l => {
-        l.nodeName ? selectedNodes.push(l.nodeName) : null;
+        // add if layer is a node marker
+        l.nodeId ? selectedNodes.push(l.nodeId) : null;
     });
     selectedNodes.forEach(curNode => {
         const otherNodes = selectedNodes.filter(n => n != curNode);
         otherNodes.forEach(otherNode => {
-            nodes.find(n => n.name == curNode).neighbors.push(otherNode);
+            nodes.get(curNode).neighbors.add(otherNode);
         });
     });
 
