@@ -557,44 +557,26 @@ function exitAddNodeMode() {
     offset = 0;
 }
 
+
+
 function handleEditorOptionChange() {
+    let exitFns = [exitAddNodeMode, exitConnectNodeMode, exitLassoMode, exitDeleteNodeMode, exitMoveMode];
+    let notExitFn;
+    let enterFn;
     if (addNodesRadio.checked) {
-        exitConnectNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterAddNodeMode();
+        [notExitFn, enterFn] = [exitAddNodeMode, enterAddNodeMode];
     } else if (modifyNodesRadio.checked) {
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterConnectNodeMode();
+        [notExitFn, enterFn] = [exitConnectNodeMode, enterConnectNodeMode];
     } else if (deleteNodesRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterDeleteNodeMode()
+        [notExitFn, enterFn] = [exitDeleteNodeMode, enterDeleteNodeMode];
     } else if (lassoConnectRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitMoveMode();
-        enterLassoMode();
+        [notExitFn, enterFn] = [exitLassoMode, enterLassoMode];
     } else if (moveRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        enterMoveMode();
-    } else {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
+        [notExitFn, enterFn] = [exitMoveMode, enterMoveMode];
     }
+    exitFns = exitFns.filter(fn => fn != notExitFn);
+    exitFns.forEach(fn => fn());
+    enterFn();
 }
 
 const lasso = L.lasso(map, {});
@@ -606,6 +588,10 @@ map.on('lasso.finished', event => {
 
 function enterLassoMode() {
     lasso.enable();
+}
+
+function exitLassoMode() {
+
 }
 
 
@@ -626,10 +612,6 @@ function handleFinishedLasso(layers) {
     drawPreview();
     redrawEdges();
     lassoConnectRadio.checked = false;
-}
-
-function exitLassoMode() {
-
 }
 
 function enterDeleteNodeMode() {
