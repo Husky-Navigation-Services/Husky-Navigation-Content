@@ -286,18 +286,16 @@ function send() {
 
 let addedMarkers = [];
 let nodesToAdd = new Map();
-let lastAddedId;
 
 function nodeEvent(e) {
     const pos = e.latlng;
     const numNodes = nodes.size;
-    let newId = lastAddedId ? lastAddedId + 1 : numNodes + 1;
+    let newId = numNodes + 1;
 
     // ensure newId is unique
-    while (nodes.has(newId)) {
+    while (nodes.has(newId) || nodesToAdd.has(newId)) {
         newId++;
     }
-    lastAddedId = newId;
 
     // add new node
     nodesToAdd.set(newId, {
