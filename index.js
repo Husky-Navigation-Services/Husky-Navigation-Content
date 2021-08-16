@@ -15,9 +15,11 @@ const viewRadio = document.getElementById("btnradio11");
 const page = document.getElementById("page");
 const deleteForm = document.getElementById("delete-container");
 var nodesTxt; // unparsed node text
-var nodes = []; // parsed list of node objects for internal representation
+var nodes = new Map(); // parsed list of node objects for internal representation
 var ogNodes = []; // makes sure undo doesn't go past this
-var prevNodes = [[]]; // stores previous nodes to allow for change reversion
+var prevNodes = [
+    []
+]; // stores previous nodes to allow for change reversion
 var nodeMarkers = []; // stores all node markers
 var tableContentRows = [];
 var edgeLayer; // Leaflet geoJSON layer
@@ -26,33 +28,35 @@ var inModifyMode = false;
 var keys = []; //keys track of keys pressed for commands
 
 // init save toast
-var saveToastEl =document.getElementById('save-toast');//select id of toast
-var saveToast = new bootstrap.Toast(saveToastEl);//inizialize it
+var saveToastEl = document.getElementById('save-toast'); //select id of toast
+var saveToast = new bootstrap.Toast(saveToastEl); //inizialize it
 setInterval(function() {
     saveToast.show();
-}, 600000); 
+}, 600000);
 
 
- 
+
 
 // init map 
 this.map = L.map('map', {
     //sets click tolerance for elements on map
     //sets padding to remove element clipping
-    renderer: L.canvas({ tolerance: 10,
-                        padding: 2}),
+    renderer: L.canvas({
+        tolerance: 10,
+        padding: 2
+    }),
     fullscreenControl: true
-    
+
 }).setView([47.6532, -122.3074], 16);
-L.tileLayer( 'https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
+L.tileLayer('https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: ['a','b','c']
-}).addTo( map );
+    subdomains: ['a', 'b', 'c']
+}).addTo(map);
 
 
 
 var r = [-122.32296105, 47.64674039, -122.28707804, 47.66318327]
-var w = new L.LatLngBounds(new L.LatLng(r[1],r[0]),new L.LatLng(r[3],r[2]))
+var w = new L.LatLngBounds(new L.LatLng(r[1], r[0]), new L.LatLng(r[3], r[2]))
 var overlay, z, A = {
     minZoom: 10,
     maxZoom: 20,
@@ -137,21 +141,21 @@ function dropHandler(ev) {
     ev.preventDefault();
 
     var file = ev.dataTransfer.files[0];
-    
+
     //if (file && file.kind === 'file') {
-        const reader = new FileReader();
-        reader.readAsText(file);
-        reader.onload = function(event) {
-            console.log(event);
-            console.log(event.target.result);
-            init(event.target.result, false);
-        };
-        console.log(file);
-        
+    const reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function(event) {
+        console.log(event);
+        console.log(event.target.result);
+        init(event.target.result, false);
+    };
+    console.log(file);
+
     //}
 
 }
-    
+
 // Update preview of Nodes.txt with given text
 function drawPreview() {
     previewTextEl.innerHTML = nodesTxt.replaceAll("\n", " <br /> ");
@@ -169,62 +173,28 @@ function drawPreview() {
 //        neighbors [array of neighbor node names]
 //    }
 function parseNodes() {
-
-    //splits code into lines
-    var lines = nodesTxt.replaceAll("\n", ",").split(",");
-    console.log(lines);
-
-    //finds the number of unique nodes
-    var nodeCount = parseInt(lines[0]);
-
-    //creates all nodes without paths to other nodes
-    for(i = 1; i <= nodeCount; i++) {
-        let nodeElements = lines[i].split(" ");
-        console.log(nodes.find(n => n.id == nodeElements[0]));
-        nodes.push(
-            {
-                //'id' now refers to the ID in the text file
-                //old 'id' property renamed as 'name'
-                id: nodeElements[0],
-                name: nodeElements[3],
-                latitude: nodeElements[1],
-                longitude: nodeElements[2],
-                //filled in later
-                neighbors: null
-            }
-        )
-    }
-    
-    //loops over the rest of the file to find node paths
-    for(i = 1 + nodeCount; lines[i]; ++i) {
-        let nodeElements = lines[i].split(" ");
-
-        //first element is the node that 
-        //everything else in the line connects to
-        var node =
-            nodes.find(node => node.id == nodeElements[0]);
-        var neighborsList = [];
-
-        //loops over all neighboring nodes
-        for(j = 1; nodeElements[j]; ++j) {
-            var neighbor = 
-                nodes.find(node => node.id == nodeElements[j]);
-            
-            //adds only neighbor name to the neighbor list
-            if(neighbor) {
-                neighborsList.push(neighbor.name);
-            }
-                
-        }
-
-        if(node) {
-            node.neighbors = neighborsList;
-        }
-
+    let lines = nodesTxt.replaceAll("\n", ",").split(",");
+    let nodeCount = parseInt(lines.shift());
+    // construct nodes
+    for (let i = 0; i < nodeCount; i++) {
+        let els = lines.shift().split(" ");
+        let [id, lat, lon, name, neighs] = [els[0], els[1], els[2], els[3].toString(), new Set()];
+        nodes.set(id, {
+            name: name.replace('\r', ''),
+            latitude: lat,
+            longitude: lon,
+            neighbors: neighs
+        });
     }
 
-    ogNodes = nodes;
-
+    // construct node paths
+    for (let i = 0; i < nodeCount; i++) {
+        let els = lines.shift().split(" ");
+        let [node, neighs] = [nodes.get(els.shift()), els];
+        neighs.forEach(neigh => {
+            node.neighbors.add(neigh.replace('\r', ''));
+        });
+    }
 }
 
 
@@ -232,41 +202,31 @@ function parseNodes() {
 function drawTable() {
     // remove all existing content rows
     tableContentRows.forEach(row => row.remove());
-    nodes.forEach(node => {
+    for (const [id, props] of nodes) {
         const row = nodesTable.insertRow();
+        const [c1, c2, c3, c4] = [0, 0, 0, 0].map(el => row.insertCell());
+        const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
+        const neighsIterator = props.neighbors.values();
+        const neighs = [...neighsIterator].map(id => " " + nodes.get(id).name);
+        console.log(neighs);
         if (inModifyMode) {
-            // Set cell content for name as text input
-            var cell = row.insertCell();
+            // Add NAME input cell
             const inputNameBox = document.createElement("input");
-            inputNameBox.id = node["id"];
+            inputNameBox.id = id;
             inputNameBox.class = "form-control";
-            inputNameBox.value = node["name"].toString().replaceAll(",", ", ");
-            inputNameBox.addEventListener ("change", handleNameChange);
-            cell.appendChild(inputNameBox);
-            // Set cell content for lat, long
-            const cells = ["latitude", "longitude"];
-            cells.forEach(i => {
-                cell = row.insertCell();
-                cell.innerHTML = node[i];
-            });
-            // Set cell content for neighbors as text input
-            cell = row.insertCell();
-            const inputNeighborsBox = document.createElement("input");
-            inputNeighborsBox.id = node["id"];
-            inputNeighborsBox.class = "form-control";
-            inputNeighborsBox.value = node["neighbors"].toString().replaceAll(",", ", ");
-            inputNeighborsBox.addEventListener ("change", handleNeighborChange);
-            cell.appendChild(inputNeighborsBox);
+            inputNameBox.value = name.replaceAll(",", ", ");
+            inputNameBox.addEventListener("change", handleNameChange);
+            c1.appendChild(inputNameBox);
         } else {
-            // Set cell content for name, lat, long, neighbors
-            const cells = ["name", "latitude", "longitude", "neighbors"];
-            cells.forEach(i => {
-                cell = row.insertCell();
-                cell.innerHTML = node[i];
-            });
-        }   
+            c1.innerHTML = name;
+        }
+
+        c2.innerHTML = lat;
+        c3.innerHTML = lon;
+        c4.innerHTML = neighs;
+
         tableContentRows.push(row);
-    })
+    }
 }
 
 function handleNameChange(e) {
@@ -274,7 +234,7 @@ function handleNameChange(e) {
     console.log(node.name)
     const originalName = node.name;
     const newName = e.target.value;
-    
+
     // update neighbor names to new name
     nodes.forEach(n => {
         n.neighbors = n.neighbors.map(neigh => {
@@ -295,11 +255,9 @@ function handleNameChange(e) {
 function drawMarkers() {
     nodeMarkers.forEach(m => {
         map.removeLayer(m);
-    })
-    nodeMarkers = [];
-    console.log(nodes.length);
-    nodes.forEach(node => {
-        const circle = L.circle([parseFloat(node.latitude), parseFloat(node.longitude)], {
+    });
+    for (const [id, props] of nodes) {
+        const circle = L.circle([parseFloat(props.latitude), parseFloat(props.longitude)], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 1,
@@ -309,11 +267,11 @@ function drawMarkers() {
             closeOnClick: true,
             autoClose: false,
             closeButton: true
-          }).setContent("<small>" + node.name + "</small>")
+        }).setContent("<small>" + props.name + "</small>")
         circle.bindPopup(popup);
-        circle.nodeName = node.name; // custom property
+        circle.nodeId = id; // custom property
         nodeMarkers.push(circle);
-    })
+    }
 }
 
 function handlePopupCheck(box) {
@@ -356,10 +314,12 @@ function constructEdgesGeoJSON() {
         "type": "FeatureCollection",
         "features": []
     };
-    nodes.forEach(node => {
-        node.neighbors.forEach(neigh => {
-            const nodeCoord = [parseFloat(node.longitude), parseFloat(node.latitude)];
-            const neighNode = nodes.find(n => n.name == neigh);
+    for (const [id, props] of nodes) {
+        props.neighbors.forEach(neigh => {
+            console.log(neigh);
+            const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
+            const neighNode = nodes.get(neigh);
+            console.log(neighNode);
             const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
             data.features.push({
                 "type": "Feature",
@@ -370,15 +330,9 @@ function constructEdgesGeoJSON() {
                 }
             })
         })
-    });
-
-    edgeLayer = L.geoJSON(data);
-    try {
-        edgeLayerGroup.addLayer(edgeLayer);
-    } catch(ignore) {
-
     }
-    
+    edgeLayer = L.geoJSON(data);
+    edgeLayerGroup.addLayer(edgeLayer);
 }
 
 
@@ -386,10 +340,10 @@ function handleNeighborChange(e) {
     // INPUT VALIDATION
     var isBadInput = false;
     var newNeighbors = e.target.value.split(",");
-    newNeighbors = newNeighbors.map(el => {return el.replaceAll(" ", "");}); // remove all spaces
+    newNeighbors = newNeighbors.map(el => { return el.replaceAll(" ", ""); }); // remove all spaces
     // Check for empty element
     if (newNeighbors.includes("")) {
-        isBadInput = true; 
+        isBadInput = true;
     }
     // Check for nonexistent node name
     newNeighbors.forEach(neighbor => {
@@ -402,18 +356,18 @@ function handleNeighborChange(e) {
         e.target.style.backgroundColor = "red";
         alert("Invalid input. Try again.");
         return;
-    } 
+    }
     // Handle good input
     e.target.style.backgroundColor = "white";
-    
+
 
     var thisNode = nodes.find(n => n.id == e.target.id);
-    
+
     // Update affected neighbor's neighbor list
     thisNode.neighbors.forEach(old => {
-        
-        if(!newNeighbors.includes(old)) {
-            
+
+        if (!newNeighbors.includes(old)) {
+
             var other = nodes.find(n => n.name == old).neighbors;
             const index = other.indexOf(thisNode.name);
             if (index > -1) {
@@ -424,15 +378,15 @@ function handleNeighborChange(e) {
 
     // Update changed node with new neighbors
     thisNode.neighbors = e.target.value.split(",").map(el => el.replaceAll(" ", ""));
-    
+
 
 
     // Update edges
     constructEdgesGeoJSON();
-    
+
     // Update table
     drawTable();
-    
+
 
     handleEdgesCheck(btncheck2);
 }
@@ -448,43 +402,42 @@ function enforceBidirectionality(displayMessage) {
     var msg = "";
     nodes.forEach(node => {
         node.neighbors.forEach(neigh => {
-            var neighborNode = nodes.find(n => {return n.name == neigh;});
+            var neighborNode = nodes.find(n => { return n.name == neigh; });
             if (neighborNode != null && !neighborNode.neighbors.includes(node.name)) {
                 msg += (neighborNode.name + " is missing neighbor " + node.name + ". Updating... \n");
                 neighborNode.neighbors.push(node.name);
             }
         });
     });
-    if(displayMessage) {
+    if (displayMessage) {
         if (msg == "") {
             alert("Nothing to fix!")
         } else {
             alert(msg);
         }
     }
-    
+
     drawTable();
 }
 
 function updatePreview() {
     var res = "";
     // write # of nodes to first line
-    res += nodes.length + "<br />";  
+    res += nodes.size + "<br />";
     // write each node id/lat/long/name to first half
-    nodes.forEach(node => {
-        res += node.id + " " + node.latitude + " " + node.longitude + " " + node.name + "<br />";
-    });
+    for (const [id, props] of nodes) {
+        res += id + " " + props.latitude + " " + props.longitude + " " + props.name + "<br />";
+    }
     // write each node id/neigh1/neigh2/etc. to second half
-    nodes.forEach(node => {
-        res += node.id + " " + node.neighbors.map(neighbor => nodes.find(n => n.name == neighbor).id).toString().replaceAll("[", "").replaceAll("]", "").replaceAll(",", " ") + "<br />";
-    }) 
+    for (const [id, props] of nodes) {
+        res += id + " " + Array.from(props.neighbors).toString().replaceAll(',', ' ') + "<br />";
+    }
     nodesTxt = res;
     drawPreview();
-   
+
 }
 
 function save() {
-    enforceBidirectionality();
     updatePreview();
     download("Nodes", nodesTxt.replaceAll("<br />", "\r\n"));
     //noticeToast.show();
@@ -492,12 +445,13 @@ function save() {
 
 // Add hashCode method to String constructor's prototype
 String.prototype.hashCode = function() {
-    var hash = 0, i, chr;
+    var hash = 0,
+        i, chr;
     if (this.length === 0) return hash;
     for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32 bit integer
+        chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32 bit integer
     }
     return hash;
 };
@@ -509,16 +463,16 @@ function send() {
     const updateID = Math.abs(Math.random().toString().hashCode());
     console.log(updateID);
     Email.send({
-        SecureToken : "39cb680d-bccd-4638-bba9-e5ef37744657",
-        To : 'huskynavigationfeedback@gmail.com',
-        From : "huskynavigationfeedback@gmail.com",
-        Subject : "Content Update " + updateID + " [" + date.toString() + "]",
-        Body : nodesTxt.replaceAll("\n", " <br /> "),
+        SecureToken: "39cb680d-bccd-4638-bba9-e5ef37744657",
+        To: 'huskynavigationfeedback@gmail.com',
+        From: "huskynavigationfeedback@gmail.com",
+        Subject: "Content Update " + updateID + " [" + date.toString() + "]",
+        Body: nodesTxt.replaceAll("\n", " <br /> "),
         // "Attached is a updated copy of Nodes.txt:\n" + 
         /*
         Attachments: [{
-            name : "Nodes.txt",
-            path : "https://hnavcontent.azurewebsites.net/Nodes.txt"
+            name: "Nodes.txt",
+            path: "https://hnavcontent.azurewebsites.net/Nodes.txt"
         }]
         */
     }).then(
@@ -528,114 +482,101 @@ function send() {
 
 
 
-var circleArray = [];
-var nodesToAdd = [];
-var addedNodes = 0;
-var nameOffset = 0;
+let addedMarkers = [];
+let nodesToAdd = new Map();
+let lastAddedId;
 
 function nodeEvent(e) {
-    var pos = e.latlng;
-    
-    if(nodesToAdd[nodesToAdd.length - 1]) {
-        var neighbor = nodesToAdd[nodesToAdd.length - 1].name;
+    const pos = e.latlng;
+    const numNodes = nodes.size;
+    let newId = lastAddedId ? lastAddedId + 1 : numNodes + 1;
+
+    // ensure newId is unique
+    while (nodes.has(newId)) {
+        newId++;
     }
+    lastAddedId = newId;
 
-    //checks for duplicate names or IDs and corrects
-    while(nodes.find(n => n.id == parseInt(nodes.length + addedNodes + nameOffset + 1)) || 
-        nodes.find(n => n.name == ['N' + (parseInt(nodes.length) +
-        parseInt(nameOffset) + 1)])) {
-            nameOffset++;
-    }
+    // add new node
+    nodesToAdd.set(newId, {
+        name: 'N' + newId,
+        latitude: pos.lat,
+        longitude: pos.lng,
+        neighbors: new Set()
+    });
 
-    if(neighbor) {
-        nodesToAdd.push( {
-            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
-            name: 'N' + (parseInt(nodes.length) +
-                parseInt(nameOffset) + 1),
-            latitude: pos.lat,
-            longitude: pos.lng,
-            neighbors: [neighbor]
-        });
-    } else {
-        nodesToAdd.push( {
-            id: parseInt(nodes.length + addedNodes + nameOffset + 1),
-            name: 'N' + (parseInt(nodes.length) +
-                parseInt(nameOffset) + 1),
-            latitude: pos.lat,
-            longitude: pos.lng,
-            neighbors: []
-        });
-    }
-
-    addedNodes++;
-    nameOffset++;
-
-    const circle = L.circle(pos, {
+    // add new markers
+    addedMarkers.push(L.circle(pos, {
         color: 'green',
         fillColor: 'green',
         fillOpacity: 1,
         radius: 3
-    }).addTo(map);
-    
-    circleArray.push(circle);
+    }).addTo(map));
 }
 
-//useless, but may be used for more functionality later
+// Enter "Add" mode
 function enterAddNodeMode() {
     map.on('click', nodeEvent);
 }
 
+// Exits "Add" mode. Updates nodes and redraws.
 function exitAddNodeMode() {
     map.off('click', nodeEvent);
-
-
     prevNodes.push(nodes);
 
-    nodes = nodes.concat(nodesToAdd);
-    
-    drawNodeElements();
+    // add neighbors to nodesToAdd
+    let prevId;
+    for (const [id, props] of nodesToAdd) {
+        if (prevId) {
+            props.neighbors.add(prevId);
+            nodesToAdd.get(prevId).neighbors.add(id);
+        }
+        prevId = id;
+    }
 
-    nodesToAdd = [];
+    // concat existing nodes with nodesToAdd
+    for (const [id, props] of nodesToAdd) {
+        nodes.set(id, props);
+    }
+
+    // remove temporary added circles
+    addedMarkers.forEach(marker => {
+        map.removeLayer(marker);
+    });
+
+    // redraw
+    drawTable();
+    drawMarkers();
+    constructEdgesGeoJSON();
+    redrawEdges();
+    handleEdgesCheck(btncheck2);
+
+    // cleanup
+    nodesToAdd = new Map();
+    lastAddedId = undefined;
+    offset = 0;
 }
 
+
+
 function handleEditorOptionChange() {
+    let exitFns = [exitAddNodeMode, exitConnectNodeMode, exitLassoMode, exitDeleteNodeMode, exitMoveMode];
+    let notExitFn;
+    let enterFn;
     if (addNodesRadio.checked) {
-        exitConnectNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterAddNodeMode();
+        [notExitFn, enterFn] = [exitAddNodeMode, enterAddNodeMode];
     } else if (modifyNodesRadio.checked) {
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterConnectNodeMode();
+        [notExitFn, enterFn] = [exitConnectNodeMode, enterConnectNodeMode];
     } else if (deleteNodesRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitLassoMode();
-        exitMoveMode();
-        enterDeleteNodeMode()
+        [notExitFn, enterFn] = [exitDeleteNodeMode, enterDeleteNodeMode];
     } else if (lassoConnectRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitMoveMode();
-        enterLassoMode();
+        [notExitFn, enterFn] = [exitLassoMode, enterLassoMode];
     } else if (moveRadio.checked) {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        enterMoveMode();
-    } else {
-        exitConnectNodeMode();
-        exitAddNodeMode();
-        exitDeleteNodeMode();
-        exitLassoMode();
-        exitMoveMode();
+        [notExitFn, enterFn] = [exitMoveMode, enterMoveMode];
     }
+    exitFns = exitFns.filter(fn => fn != notExitFn);
+    exitFns.forEach(fn => fn());
+    enterFn();
 }
 
 const lasso = L.lasso(map, {});
@@ -649,27 +590,28 @@ function enterLassoMode() {
     lasso.enable();
 }
 
+function exitLassoMode() {
+
+}
+
 
 function handleFinishedLasso(layers) {
     const selectedNodes = [];
     layers.forEach(l => {
-        l.nodeName ? selectedNodes.push(l.nodeName) : null;
+        // add if layer is a node marker
+        l.nodeId ? selectedNodes.push(l.nodeId) : null;
     });
     selectedNodes.forEach(curNode => {
         const otherNodes = selectedNodes.filter(n => n != curNode);
         otherNodes.forEach(otherNode => {
-            nodes.find(n => n.name == curNode).neighbors.push(otherNode);
+            nodes.get(curNode).neighbors.add(otherNode);
         });
     });
-    
+
     drawTable();
     drawPreview();
     redrawEdges();
     lassoConnectRadio.checked = false;
-}
-
-function exitLassoMode() {
-    
 }
 
 function enterDeleteNodeMode() {
@@ -685,24 +627,25 @@ function exitDeleteNodeMode() {
 }
 
 function deleteNodeEvent(e) {
-    map.removeLayer(e.target);
-    nodes = nodes.filter(n => n.name != e.target.nodeName);
-    deleteAllNeighborsByName(e.target.nodeName);
+    const n = e.target;
+    const id = n.nodeId;
+    const neighs = nodes.get(id).neighbors;
+    map.removeLayer(n);
+
+    // clear connections
+    neighs.forEach(n => {
+        nodes.get(n).neighbors.delete(id);
+    });
+
+    nodes.delete(id);
     drawTable();
     constructEdgesGeoJSON();
     handleEdgesCheck(btncheck2);
-    enterDeleteNodeMode(); // to re-attatch event listeners to the newly-generated markers
-    
 }
 
-function deleteAllNeighborsByName(name) {
-    nodes.forEach(node => {
-        node.neighbors = node.neighbors.filter(neigh => neigh != name);
-    })
-}
 
 function redrawEdges() {
-    if(edgeModeOn) {
+    if (edgeModeOn) {
         map.removeLayer(edgeLayer);
         constructEdgesGeoJSON();
         edgeLayer.addTo(map);
@@ -711,46 +654,31 @@ function redrawEdges() {
 }
 
 function enterConnectNodeMode() {
-    
     nodeMarkers.forEach(circle => {
         circle.on('click', connectNodeEvent);
     });
 }
+
 function exitConnectNodeMode() {
     nodeMarkers.forEach(circle => {
         circle.off('click', connectNodeEvent);
     });
 }
 
-var firstCircle = null;
+var firstId;
 
 function connectNodeEvent(e) {
-    console.log("works");
-    var clickedCircle = e.target;
-    if (!firstCircle) { // if first circle wasn't already clicked
-        firstCircle = clickedCircle.nodeName;
-        console.log("first circle :" + clickedCircle);
-        return;
-    } else { // if first circle was already clicked
-        console.log("second circle");
-        var firstNode = nodes.find(n => n.name == firstCircle);
-        if (!firstNode.neighbors.includes(clickedCircle.nodeName)) {
-            firstNode.neighbors.push(clickedCircle.nodeName);
-        } else {
-            alert("Stop adding duplicate connections!");
-        }
-        firstCircle = null;
+    const clickedId = e.target.nodeId;
+    if (!firstId) {
+        firstId = clickedId;
+    } else {
+        nodes.get(firstId).neighbors.add(clickedId);
+        nodes.get(clickedId).neighbors.add(firstId);
+        firstId = undefined;
         drawTable();
         constructEdgesGeoJSON();
-        enforceBidirectionality();
         redrawEdges();
-        return;
     }
-    
-}
-
-function deleteNodes(e) {
-    alert("TODO: handle form submit");
 }
 
 function handleEditorTableOptionChange() {
@@ -767,12 +695,12 @@ function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
-  
+
     element.style.display = 'none';
     document.body.appendChild(element);
-  
+
     element.click();
-  
+
     document.body.removeChild(element);
 }
 
@@ -796,25 +724,23 @@ function handleCommands() {
 
     document.addEventListener("keydown", function(e) {
         keys[e.keyCode] = true;
-        }
-    , false);
+    }, false);
 
     document.addEventListener('keyup', function(e) {
         keys[e.keyCode] = false;
-        }
-    , false);
+    }, false);
 }
 
 //checks keys pressed every 10ms for commands
 //add new commands here
 function commandLoop() {
 
-    switch(true) {
+    switch (true) {
         //ctrl + z
         case keys[17] && keys[90]:
             handleUndo();
             break;
-        //ctrl + y
+            //ctrl + y
         case keys[17] && keys[89]:
             handleRedo();
             break;
@@ -824,20 +750,23 @@ function commandLoop() {
     setTimeout(commandLoop, 10);
 }
 
-var undoneNodes = [[]];
+var undoneNodes = [
+    []
+];
+
 function handleUndo() {
 
     var update = prevNodes.pop();
-    
-    if(update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
+
+    if (update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
 
         undoneNodes.push(nodes);
-        
+
         nodes = update;
-        
+
         drawNodeElements();
     }
-    
+
 
 }
 
@@ -845,7 +774,7 @@ function handleRedo() {
 
     var update = undoneNodes.pop();
 
-    if(update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
+    if (update && update.length > 0 && !isSameArrayByElems(update, nodes)) {
 
         prevNodes.push(nodes);
 
@@ -856,31 +785,13 @@ function handleRedo() {
 
 }
 
-//quick way to redraw nodes
-function drawNodeElements() {
-
-    circleArray.forEach(circle => {
-        map.removeLayer(circle);
-    });
-
-    drawTable();
-    drawMarkers();
-
-    enforceBidirectionality(false);
-    constructEdgesGeoJSON();
-
-    redrawEdges()
-
-    handleEdgesCheck(btncheck2);
-}
-
 function isSameArrayByElems(ar1, ar2) {
 
-    if(ar1.length == ar2.length) {
+    if (ar1.length == ar2.length) {
 
-        for(i = 0; i < ar1.length; i++) {
+        for (i = 0; i < ar1.length; i++) {
 
-            if(ar1[i] != ar2[i]) {
+            if (ar1[i] != ar2[i]) {
                 return false;
             }
 
@@ -901,9 +812,9 @@ function handleOverlayCheck(box) {
     }
 }
 
-/* Node Modification Functions */
+/* Node Moving Functions */
 
-var movingNode;
+let movingNode;
 
 // 1
 function enterMoveMode() {
@@ -913,25 +824,23 @@ function enterMoveMode() {
 }
 
 // 2
-function moveNode(mdown) {
-    movingNode = mdown.target;
+function moveNode(click) {
+    movingNode = click.target;
     map.on('mousemove', moveNodeToNewCoords);
     movingNode.on('click', finishNodeMove);
 }
 
 // 3
-function moveNodeToNewCoords(mmove) {
-    movingNode.setLatLng(mmove.latlng);
+function moveNodeToNewCoords(move) {
+    movingNode.setLatLng(move.latlng);
 }
 
 // 4
 function finishNodeMove() {
-    console.log("hello");
     map.off('mousemove', moveNodeToNewCoords);
-    console.log(movingNode);
-    const movingNodeObj = nodes.find(n => n.name == movingNode.nodeName);
-    movingNodeObj.latitude = movingNode._latlng.lat;
-    movingNodeObj.longitude = movingNode._latlng.lng;
+    const movingNodeProps = nodes.get(movingNode.nodeId);
+    movingNodeProps.latitude = movingNode.getLatLng().lat;
+    movingNodeProps.longitude = movingNode.getLatLng().lng;
     drawTable();
     redrawEdges();
     movingNode = null;
