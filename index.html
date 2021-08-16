@@ -25,7 +25,11 @@
     <!-- Fullscreen Plugin -->
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js' defer></script>
     <!-- Load primary JavaScript source code -->
+    <script src="Scripts/utils.js" defer></script>
+    <script src="Scripts/handlers.js" defer></script>
+    <script src="Scripts/nodeModes.js" defer></script>
     <script src="Scripts/lifecycleFns.js" defer></script>
+    <script src="Scripts/commandFns.js" defer></script>
     <script src="Scripts/initFns.js" defer></script>
     <script src="index.js" defer></script>
 </head>
@@ -34,7 +38,7 @@
         <div class="toast-body">
             Don't forget to export your work!
             <div class="mt-2 pt-2 border-top">
-                <button type="button" class="btn btn-primary btn-sm" onclick="save()">Export</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveData()">Export</button>
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
             </div>
         </div>
@@ -49,8 +53,8 @@
 
             <div id="map-options" class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
 
-                <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" onclick="handleEdgesCheck(this)">
-                <label id="mid-checkbox" class="btn btn-outline-light" for="btncheck2">Show Edges</label>
+                <input type="checkbox" class="btn-check" id="edges-checkbox" autocomplete="off" onclick="handleEdgesCheck(this)">
+                <label id="mid-checkbox" class="btn btn-outline-light" for="edges-checkbox">Show Edges</label>
 
                 <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off" onclick="handleOverlayCheck(this)">
                 <label class="btn btn-outline-light" for="btncheck3">Show Overlay</label>
@@ -72,8 +76,8 @@
                 <div id="preview" class="bg-dark">
                     <h3 id="preview-title">Preview</h3>
                     <button id="update-prev-btn" type="button" class="btn btn-primary" onclick="updatePreview()">Update Preview</button>
-                    <button id="save-btn" type="button" class="btn btn-primary" onclick="save()">Export</button>
-                    <button id="send-btn" type="button" class="btn btn-primary" onclick="send()">Send</button>
+                    <button id="save-btn" type="button" class="btn btn-primary" onclick="saveData()">Export</button>
+                    <button id="send-btn" type="button" class="btn btn-primary" onclick="sendData()">Send</button>
                     <hr>
                     <div id="preview-text" ondrop="dropHandler(event)" ondragover="dragOverHandler(event);">
                         <p id="preview-fill-text">Please select node data to see preview. </br> <span style="color: gray;">Editing is not possible on mobile devices.</span></p>
@@ -87,7 +91,7 @@
 
                         <div style="display:flex; justify-content: flex-end;">
                             <h3 id="editor-title">Editor</h3>
-                            <div id="editor-options" class="btn-group" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorOptionChange()">
+                            <div id="editor-options" class="btn-group" role="group" aria-label="Mode Radio Toggle" onclick="handleModeChange()">
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
                                 <label class="btn btn-outline-success option" for="btnradio1">Add</label>
 
@@ -112,8 +116,8 @@
 
                         </div>
                         <div style="display:flex; justify-content: flex-end;">
-                            <input id="search-input" type="text" class="form-control" placeholder="" oninput="filterTable(this)">
-                            <div id="editor-table-options" class="btn-group option" role="group" aria-label="Mode Radio Toggle" onclick="handleEditorTableOptionChange()">
+                            <input id="search-input" type="text" class="form-control" placeholder="" oninput="handleSearch(this)">
+                            <div id="editor-table-options" class="btn-group option" role="group" aria-label="Mode Radio Toggle" onclick="handleTableChange()">
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio11" autocomplete="off" checked>
                                 <label class="btn btn-outline-info" for="btnradio11">View Table</label>
 
