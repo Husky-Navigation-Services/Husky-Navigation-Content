@@ -14,119 +14,25 @@ const viewRadio = document.getElementById("btnradio11");
 
 const page = document.getElementById("page");
 const deleteForm = document.getElementById("delete-container");
-var nodesTxt; // unparsed node text
-var nodes = new Map(); // parsed list of node objects for internal representation
+
+
 var ogNodes = []; // makes sure undo doesn't go past this
 var prevNodes = [
     []
 ]; // stores previous nodes to allow for change reversion
-var nodeMarkers = []; // stores all node markers
-var tableContentRows = [];
+
+
 var edgeLayer; // Leaflet geoJSON layer
 var edgeLayerGroup = L.layerGroup([]);
-var inModifyMode = false;
+
 var keys = []; //keys track of keys pressed for commands
 
-// init save toast
-var saveToastEl = document.getElementById('save-toast'); //select id of toast
-var saveToast = new bootstrap.Toast(saveToastEl); //inizialize it
-setInterval(function() {
-    saveToast.show();
-}, 600000);
+// init
+initSaveToast();
+initMap();
+initOverlay();
+parseLatestAndDrawMap();
 
-
-
-
-// init map 
-this.map = L.map('map', {
-    //sets click tolerance for elements on map
-    //sets padding to remove element clipping
-    renderer: L.canvas({
-        tolerance: 10,
-        padding: 2
-    }),
-    fullscreenControl: true
-
-}).setView([47.6532, -122.3074], 16);
-L.tileLayer('https://api.mapbox.com/styles/v1/aferman/ckhvetwgy0bds19nznkfvodbx/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWZlcm1hbiIsImEiOiJja2ZrZXJvbjUwZW5wMnhxcjdyMXc3ZjRnIn0.WGdId2uO9XokPaJmaxlLXg', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: ['a', 'b', 'c']
-}).addTo(map);
-
-
-
-var r = [-122.32296105, 47.64674039, -122.28707804, 47.66318327]
-var w = new L.LatLngBounds(new L.LatLng(r[1], r[0]), new L.LatLng(r[3], r[2]))
-var overlay, z, A = {
-    minZoom: 10,
-    maxZoom: 20,
-    bounds: w,
-    opacity: 1,
-    attribution: 'Rendered with <a href="http://www.maptiler.com/">MapTiler</a>',
-    tms: !1,
-    className: "uw-tilelayer"
-};
-z = "https://www.washington.edu/maps/wp-content/themes/maps-2014/tiles/retina/{z}/{x}/{y}.png"
-overlay = L.tileLayer(z, A);
-
-
-// MAIN
-
-// fetch latest data, parse data, draw map markers
-fetch('Nodes.txt')
-    .then(response => response.text())
-    .then(txt => {
-        startup(txt);
-    });
-
-// parse given data, draw map markers
-function startup(txt) {
-    nodesTxt = txt;
-    parseNodes();
-    drawMarkers();
-    constructEdgesGeoJSON();
-}
-
-// if continuing with latest data: show controls, draw preview, draw table, begin command loop
-// otherwise: show controls, parse nodes, draw table, draw map markers, construct edges, begin command loop
-function init(txt, isLatestData) {
-    showControls();
-    if (isLatestData) {
-        drawPreview();
-        drawTable();
-        handleCommands();
-        commandLoop();
-    } else {
-        nodesTxt = txt;
-        drawPreview();
-        parseNodes();
-        drawTable();
-        drawMarkers();
-        constructEdgesGeoJSON();
-        handleCommands();
-        commandLoop();
-    }
-}
-
-function showControls() {
-    const els = [
-        document.getElementById("update-prev-btn"),
-        document.getElementById("save-btn"),
-        document.getElementById("send-btn"),
-        document.getElementById("map-options"),
-        document.getElementById("editor-options"),
-        document.getElementById("editor-table-options"),
-        document.getElementById("search-input"),
-    ]
-
-    els.forEach(el => {
-        el.style.pointerEvents = "all";
-        el.style.opacity = 1;
-    })
-
-    document.getElementById("preview-fill-text").style.display = "none";
-    document.getElementById("dropbox-div-2").style.display = "none";
-}
 
 function dragOverHandler(ev) {
     ev.preventDefault();
@@ -161,126 +67,22 @@ function drawPreview() {
     previewTextEl.innerHTML = nodesTxt.replaceAll("\n", " <br /> ");
 }
 
-// Given a string of nodes in the standard format:
-//      [latitude] [longitude] [id] [neighbor1lat] [neighbor1long] [neighbor1id] [neighbor2lat] [neighbor2long] [neighbor2id]
-//      , [latitude] [longitude] [id] [neighbor3lat] [neighbor3long] [neighbor3id] [neighbor4lat] [neighbor4long] [neighbor4id]
-// this sets "nodes" variable to contain a list of node objects.
-// Each node object contains properties:
-//    {
-//        id [string]
-//        latitude [string]
-//        longitude [string]
-//        neighbors [array of neighbor node names]
-//    }
-function parseNodes() {
-    let lines = nodesTxt.replaceAll("\n", ",").split(",");
-    let nodeCount = parseInt(lines.shift());
-    // construct nodes
-    for (let i = 0; i < nodeCount; i++) {
-        let els = lines.shift().split(" ");
-        let [id, lat, lon, name, neighs] = [els[0], els[1], els[2], els[3].toString(), new Set()];
-        nodes.set(id, {
-            name: name.replace('\r', ''),
-            latitude: lat,
-            longitude: lon,
-            neighbors: neighs
-        });
-    }
-
-    // construct node paths
-    for (let i = 0; i < nodeCount; i++) {
-        let els = lines.shift().split(" ");
-        let [node, neighs] = [nodes.get(els.shift()), els];
-        neighs.forEach(neigh => {
-            node.neighbors.add(neigh.replace('\r', ''));
-        });
-    }
-}
-
-
-// Update table view according to "nodes" object
-function drawTable() {
-    // remove all existing content rows
-    tableContentRows.forEach(row => row.remove());
-    for (const [id, props] of nodes) {
-        const row = nodesTable.insertRow();
-        const [c1, c2, c3, c4] = [0, 0, 0, 0].map(el => row.insertCell());
-        const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
-        const neighsIterator = props.neighbors.values();
-        const neighs = [...neighsIterator].map(id => " " + nodes.get(id).name);
-        console.log(neighs);
-        if (inModifyMode) {
-            // Add NAME input cell
-            const inputNameBox = document.createElement("input");
-            inputNameBox.id = id;
-            inputNameBox.class = "form-control";
-            inputNameBox.value = name.replaceAll(",", ", ");
-            inputNameBox.addEventListener("change", handleNameChange);
-            c1.appendChild(inputNameBox);
-        } else {
-            c1.innerHTML = name;
-        }
-
-        c2.innerHTML = lat;
-        c3.innerHTML = lon;
-        c4.innerHTML = neighs;
-
-        tableContentRows.push(row);
-    }
-}
 
 function handleNameChange(e) {
-    const node = nodes.find(n => n.id == e.target.id);
-    console.log(node.name)
-    const originalName = node.name;
+    const id = e.target.id;
+    const props = nodes.get(id);
+    const oldName = props.name;
     const newName = e.target.value;
-
-    // update neighbor names to new name
-    nodes.forEach(n => {
-        n.neighbors = n.neighbors.map(neigh => {
-            if (neigh == originalName) {
-                console.log(originalName);
-                return newName;
-            } else {
-                return neigh;
-            }
-        });
+    props.name = newName;
+    props.neighbors.forEach(neigh => {
+        const neighProps = nodes.get(neigh);
+        neighProps.remove(oldName);
+        neighProps.add(newName);
     });
-    // update node name to new name
-    node.name = newName;
     drawMarkers();
 }
 
-// Draw markers as LeafletJS circles
-function drawMarkers() {
-    nodeMarkers.forEach(m => {
-        map.removeLayer(m);
-    });
-    for (const [id, props] of nodes) {
-        const circle = L.circle([parseFloat(props.latitude), parseFloat(props.longitude)], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 1,
-            radius: 2
-        }).addTo(map);
-        var popup = L.popup({
-            closeOnClick: true,
-            autoClose: false,
-            closeButton: true
-        }).setContent("<small>" + props.name + "</small>")
-        circle.bindPopup(popup);
-        circle.nodeId = id; // custom property
-        nodeMarkers.push(circle);
-    }
-}
 
-function handlePopupCheck(box) {
-    if (box.checked) {
-        togglePopups("on");
-    } else {
-        togglePopups("off");
-    }
-}
 
 function togglePopups(cmd) {
     if (cmd == "on") {
@@ -562,7 +364,7 @@ function exitAddNodeMode() {
 function handleEditorOptionChange() {
     let exitFns = [exitAddNodeMode, exitConnectNodeMode, exitLassoMode, exitDeleteNodeMode, exitMoveMode];
     let notExitFn;
-    let enterFn;
+    let enterFn = () => {};
     if (addNodesRadio.checked) {
         [notExitFn, enterFn] = [exitAddNodeMode, enterAddNodeMode];
     } else if (modifyNodesRadio.checked) {
