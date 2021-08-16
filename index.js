@@ -290,10 +290,13 @@ let nodesToAdd = new Map();
 function nodeEvent(e) {
     const pos = e.latlng;
     const numNodes = nodes.size;
+    const nodeNames = Array.from(nodes.values()).map(el => el.name);
+    const nodesToAddNames = Array.from(nodesToAdd.values()).map(el => el.name);
     let newId = numNodes + 1;
 
     // ensure newId is unique
-    while (nodes.has(newId) || nodesToAdd.has(newId)) {
+    while (nodes.has(newId) || nodesToAdd.has(newId) ||
+        nodeNames.includes("N" + newId) || nodesToAddNames.includes("N" + newId)) {
         newId++;
     }
 
