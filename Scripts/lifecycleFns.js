@@ -147,7 +147,7 @@ function drawMarkers() {
     }
 }
 // Draws edges on map if edge mode is on
-function drawEdges() {
+function redrawEdges() {
     if (edgeModeOn) {
         map.removeLayer(edgeLayer);
         updateEdges();

@@ -1,28 +1,60 @@
 /*  Handlers 
-    > handleEditorOptionChange 
+    > handleModeChange
+    > handleTableChange
+    > handleSearch
+    > handleOverlayCheck
+    > handleEdgesCheck
+    > handleNameChange
+    > dragOverHandler
+    > dropHandler
 */
 const edgesCheckbox = document.getElementById("edges-checkbox");
 let edgeModeOn = false;
+let lastNodeMode = "view";
 
 // Handle MODE option change
 function handleModeChange() {
-    let exitFns = [exitAddNodeMode, exitConnectNodeMode, exitLassoMode, exitDeleteNodeMode, exitMoveMode];
-    let notExitFn = () => {};
-    let enterFn = () => {};
+    exitLastMode();
     if (addNodesRadio.checked) {
-        [notExitFn, enterFn] = [exitAddNodeMode, enterAddNodeMode];
+        enterAddNodeMode();
+        lastNodeMode = "add";
     } else if (modifyNodesRadio.checked) {
-        [notExitFn, enterFn] = [exitConnectNodeMode, enterConnectNodeMode];
+        enterConnectNodeMode();
+        lastNodeMode = "connect";
     } else if (deleteNodesRadio.checked) {
-        [notExitFn, enterFn] = [exitDeleteNodeMode, enterDeleteNodeMode];
+        enterDeleteNodeMode();
+        lastNodeMode = "delete";
     } else if (lassoConnectRadio.checked) {
-        enterFn = enterLassoMode;
+        enterLassoMode();
+        lastNodeMode = "lasso";
     } else if (moveRadio.checked) {
-        [notExitFn, enterFn] = [exitMoveMode, enterMoveMode];
+        enterMoveMode();
+        lastNodeMode = "move";
+    } else {
+        lastNodeMode = "view";
     }
-    exitFns = exitFns.filter(fn => fn != notExitFn);
-    exitFns.forEach(fn => fn());
-    enterFn();
+}
+
+function exitLastMode() {
+    switch (lastNodeMode) {
+        case "add":
+            exitAddNodeMode();
+            break;
+        case "connect":
+            exitConnectNodeMode()
+            break;
+        case "lasso":
+            exitLassoMode();
+            break;
+        case "delete":
+            exitDeleteNodeMode();
+            break;
+        case "move":
+            exitMoveMode();
+            break;
+        case "view":
+            break;
+    }
 }
 
 // Handle TABLE option change
