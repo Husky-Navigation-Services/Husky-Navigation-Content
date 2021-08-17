@@ -75,6 +75,7 @@ function showControls() {
         document.getElementById("editor-options"),
         document.getElementById("editor-table-options"),
         document.getElementById("search-input"),
+        document.getElementById("update-table-btn")
     ]
     els.forEach(el => {
         el.style.pointerEvents = "all";
