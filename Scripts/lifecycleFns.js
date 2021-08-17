@@ -193,5 +193,6 @@ function sendData() {
 // Updates node preview and downloads data
 function saveData() {
     updatePreview();
+    drawPreview();
     download("Nodes", nodesTxt.replaceAll("<br />", "\r\n"));
 }
