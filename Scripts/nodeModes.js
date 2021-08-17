@@ -144,7 +144,7 @@ function handleFinishedLasso(layers) {
             nodes.get(curNode).neighbors.add(otherNode);
         });
     });
-    drawEdges();
+    redrawEdges();
     lassoConnectRadio.checked = false;
 }
 
@@ -174,8 +174,7 @@ function deleteNodeEvent(e) {
         nodes.get(n).neighbors.delete(id);
     });
     nodes.delete(id);
-    updateEdges();
-    handleEdgesCheck(edgesCheckbox);
+    redrawEdges();
 }
 ///////////////////
 // Move
@@ -202,7 +201,7 @@ function finishNodeMove() {
     const movingNodeProps = nodes.get(movingNode.nodeId);
     movingNodeProps.latitude = movingNode.getLatLng().lat;
     movingNodeProps.longitude = movingNode.getLatLng().lng;
-    drawEdges();
+    redrawEdges();
     movingNode = null;
 }
 // Exit move mode
