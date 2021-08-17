@@ -118,7 +118,6 @@ function connectNodeEvent(e) {
         nodes.get(firstId).neighbors.add(clickedId);
         nodes.get(clickedId).neighbors.add(firstId);
         firstId = undefined;
-        updateEdges();
         redrawEdges();
     }
 }
