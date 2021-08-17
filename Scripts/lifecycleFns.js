@@ -56,7 +56,7 @@ function updateEdges() {
     for (const [id, props] of nodes) {
         props.neighbors.forEach(neigh => {
             const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
-            const neighNode = nodes.get(neigh);
+            const neighNode = nodes.get(neigh.toString());
             const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
             data.features.push({
                 "type": "Feature",
@@ -103,7 +103,7 @@ function drawTable() {
         const [c1, c2, c3, c4] = [0, 0, 0, 0].map(el => row.insertCell());
         const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
         const neighsIterator = props.neighbors.values();
-        const neighs = [...neighsIterator].map(id => " " + nodes.get(id).name);
+        const neighs = [...neighsIterator].map(id => " " + nodes.get(id.toString()).name);
         if (inModifyMode) {
             // Add NAME input cell
             const inputNameBox = document.createElement("input");

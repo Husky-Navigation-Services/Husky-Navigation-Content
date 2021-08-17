@@ -94,15 +94,9 @@ function handleEdgesCheck(box) {
 // Handle node name change
 function handleNameChange(e) {
     const id = e.target.id;
-    const props = nodes.get(id);
-    const oldName = props.name;
+    const props = nodes.get(id.toString());
     const newName = e.target.value;
     props.name = newName;
-    props.neighbors.forEach(neigh => {
-        const neighProps = nodes.get(neigh);
-        neighProps.remove(oldName);
-        neighProps.add(newName);
-    });
     drawMarkers();
 }
 

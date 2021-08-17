@@ -35,15 +35,15 @@ function exitAddNodeMode() {
     let prevId;
     for (const [id, props] of nodesToAdd) {
         if (prevId) {
-            props.neighbors.add(prevId);
-            nodesToAdd.get(prevId).neighbors.add(id);
+            props.neighbors.add(prevId.toString());
+            nodesToAdd.get(prevId.toString()).neighbors.add(id.toString());
         }
-        prevId = id;
+        prevId = id.toString();
     }
 
     // concat existing nodes with nodesToAdd
     for (const [id, props] of nodesToAdd) {
-        nodes.set(id, props);
+        nodes.set(id.toString(), props);
     }
 
     // remove temporary added circles
@@ -73,8 +73,8 @@ function nodeEvent(e) {
         nodeNames.includes("N" + newId) || nodesToAddNames.includes("N" + newId)) {
         newId++;
     }
-    console.log("New Id is: " + newId);
-    console.log(nodes.has(newId));
+
+    newId = newId.toString();
 
     // add new node
     nodesToAdd.set(newId, {
@@ -110,9 +110,9 @@ function exitConnectNodeMode() {
 }
 // Handler for node connection
 function connectNodeEvent(e) {
-    const clickedId = e.target.nodeId;
+    const clickedId = e.target.nodeId.toString();
     if (!firstId) {
-        firstId = clickedId;
+        firstId = clickedId.toString();
     } else {
         nodes.get(firstId).neighbors.add(clickedId);
         nodes.get(clickedId).neighbors.add(firstId);
@@ -138,7 +138,7 @@ function handleFinishedLasso(layers) {
     const selectedNodes = [];
     layers.forEach(l => {
         // add if layer is a node marker
-        l.nodeId ? selectedNodes.push(l.nodeId) : null;
+        l.nodeId ? selectedNodes.push(l.nodeId.toString()) : null;
     });
     selectedNodes.forEach(curNode => {
         const otherNodes = selectedNodes.filter(n => n != curNode);
@@ -169,13 +169,13 @@ function exitDeleteNodeMode() {
 function deleteNodeEvent(e) {
     const n = e.target;
     const id = n.nodeId;
-    const neighs = nodes.get(id).neighbors;
+    const neighs = nodes.get(id.toString()).neighbors;
     map.removeLayer(n);
     // clear connections
     neighs.forEach(n => {
-        nodes.get(n).neighbors.delete(id);
+        nodes.get(n).neighbors.delete(id.toString());
     });
-    nodes.delete(id);
+    nodes.delete(id.toString());
     redrawEdges();
 }
 ///////////////////
@@ -200,7 +200,7 @@ function moveNodeToNewCoords(move) {
 // Handle completion of node movement 
 function finishNodeMove() {
     map.off('mousemove', moveNodeToNewCoords);
-    const movingNodeProps = nodes.get(movingNode.nodeId);
+    const movingNodeProps = nodes.get(movingNode.nodeId.toString());
     movingNodeProps.latitude = movingNode.getLatLng().lat;
     movingNodeProps.longitude = movingNode.getLatLng().lng;
     redrawEdges();
