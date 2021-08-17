@@ -5,7 +5,9 @@
     > drawPreview: draws textual node data in preview
     > drawTable: draws table from node map
     > drawMarkers: draws markers from node map
+    > removeEdges: removes stored edges from map
     > drawEdges: draws edges from stored edge data
+    > redrawEdges: full cleanup, update, and redraw of edges
     > sendData: sends data to hnav team
     > saveData: exports/downloads data to text file
 */
@@ -146,14 +148,25 @@ function drawMarkers() {
         nodeMarkers.push(circle);
     }
 }
+
+function removeEdges() {
+    edgeLayer.remove();
+}
+
 // Draws edges on map if edge mode is on
-function redrawEdges() {
+function drawEdges() {
+    map.removeLayer(edgeLayer);
     if (edgeModeOn) {
-        map.removeLayer(edgeLayer);
-        updateEdges();
         edgeLayer.addTo(map);
         edgeLayer.bringToBack();
     }
+}
+
+// Full cleanup, update, and redraw of edges
+function redrawEdges() {
+    removeEdges();
+    updateEdges();
+    drawEdges();
 }
 
 // Send node data

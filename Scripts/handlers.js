@@ -83,16 +83,12 @@ function handleOverlayCheck(box) {
 
 // Handle "Show Edges" checkbox change
 function handleEdgesCheck(box) {
-    edgeLayerGroup.eachLayer(function(layer) {
-        map.removeLayer(layer);
-    })
     if (box.checked) {
-        edgeLayer.addTo(map);
         edgeModeOn = true;
     } else {
         edgeModeOn = false;
     }
-    edgeLayer.bringToBack();
+    drawEdges();
 }
 
 // Handle node name change

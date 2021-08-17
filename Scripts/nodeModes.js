@@ -52,11 +52,8 @@ function exitAddNodeMode() {
     });
 
     // redraw
-    drawTable();
     drawMarkers();
-    updateEdges();
     redrawEdges();
-    handleEdgesCheck(edgesCheckbox);
 
     // cleanup
     nodesToAdd = new Map();
@@ -147,7 +144,7 @@ function handleFinishedLasso(layers) {
             nodes.get(curNode).neighbors.add(otherNode);
         });
     });
-    redrawEdges();
+    drawEdges();
     lassoConnectRadio.checked = false;
 }
 
@@ -177,7 +174,6 @@ function deleteNodeEvent(e) {
         nodes.get(n).neighbors.delete(id);
     });
     nodes.delete(id);
-    drawTable();
     updateEdges();
     handleEdgesCheck(edgesCheckbox);
 }
@@ -206,7 +202,7 @@ function finishNodeMove() {
     const movingNodeProps = nodes.get(movingNode.nodeId);
     movingNodeProps.latitude = movingNode.getLatLng().lat;
     movingNodeProps.longitude = movingNode.getLatLng().lng;
-    redrawEdges();
+    drawEdges();
     movingNode = null;
 }
 // Exit move mode
