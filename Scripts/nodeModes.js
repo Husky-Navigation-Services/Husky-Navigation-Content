@@ -69,10 +69,12 @@ function nodeEvent(e) {
     let newId = numNodes + 1;
 
     // ensure newId is unique
-    while (nodes.has(newId) || nodesToAdd.has(newId) ||
+    while (nodes.has(newId.toString()) || nodesToAdd.has(newId.toString()) ||
         nodeNames.includes("N" + newId) || nodesToAddNames.includes("N" + newId)) {
         newId++;
     }
+    console.log("New Id is: " + newId);
+    console.log(nodes.has(newId));
 
     // add new node
     nodesToAdd.set(newId, {

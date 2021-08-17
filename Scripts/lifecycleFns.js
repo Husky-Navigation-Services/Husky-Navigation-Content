@@ -55,10 +55,8 @@ function updateEdges() {
     };
     for (const [id, props] of nodes) {
         props.neighbors.forEach(neigh => {
-            console.log(neigh);
             const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
             const neighNode = nodes.get(neigh);
-            console.log(neighNode);
             const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
             data.features.push({
                 "type": "Feature",
@@ -105,7 +103,6 @@ function drawTable() {
         const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
         const neighsIterator = props.neighbors.values();
         const neighs = [...neighsIterator].map(id => " " + nodes.get(id).name);
-        console.log(neighs);
         if (inModifyMode) {
             // Add NAME input cell
             const inputNameBox = document.createElement("input");
@@ -174,7 +171,6 @@ function sendData() {
     enforceBidirectionality();
     updatePreview();
     const timestamp = new Date().getUTCMilliseconds();
-    console.log(updateID);
     Email.send({
         SecureToken: "39cb680d-bccd-4638-bba9-e5ef37744657",
         To: 'huskynavigationfeedback@gmail.com',
