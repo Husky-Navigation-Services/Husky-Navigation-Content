@@ -86,6 +86,7 @@ function updatePreview() {
         res += id + " " + Array.from(props.neighbors).toString().replaceAll(',', ' ') + "<br />";
     }
     nodesTxt = res;
+    drawPreview();
 }
 
 // Update preview of Nodes.txt with given text
@@ -168,8 +169,8 @@ function redrawEdges() {
 
 // Send node data
 function sendData() {
-    enforceBidirectionality();
     updatePreview();
+    drawPreview();
     const timestamp = new Date().getUTCMilliseconds();
     Email.send({
         SecureToken: "39cb680d-bccd-4638-bba9-e5ef37744657",
