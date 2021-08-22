@@ -30,7 +30,7 @@ function parseNodes() {
     for (let i = 0; i < nodeCount; i++) {
         let els = lines.shift().split(" ");
         let [id, lat, lon, name, neighs] = [els[0], els[1], els[2], els[3].toString(), new Set()];
-        nodes.set(id, {
+        nodes.set(id.toString(), {
             name: name.replace('\r', ''),
             latitude: lat,
             longitude: lon,
@@ -54,19 +54,21 @@ function updateEdges() {
         "features": []
     };
     for (const [id, props] of nodes) {
-        props.neighbors.forEach(neigh => {
-            const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
-            const neighNode = nodes.get(neigh.toString());
-            const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
-            data.features.push({
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": [nodeCoord, neighCoord]
+            props.neighbors.forEach(neigh => {
+                const nodeCoord = [parseFloat(props.longitude), parseFloat(props.latitude)];
+                const neighNode = nodes.get(neigh.toString());
+                if (neighNode) {
+                    const neighCoord = [parseFloat(neighNode.longitude), parseFloat(neighNode.latitude)]
+                    data.features.push({
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": [nodeCoord, neighCoord]
+                        }
+                    })
                 }
             })
-        })
     }
     edgeLayer = L.geoJSON(data);
     edgeLayerGroup.addLayer(edgeLayer);
@@ -194,5 +196,5 @@ function sendData() {
 function saveData() {
     updatePreview();
     drawPreview();
-    download("Nodes", nodesTxt.replaceAll("<br />", "\r\n"));
+    download("Nodes", nodesTxt.replaceAll("<br />", "\n"));
 }
