@@ -16,6 +16,7 @@ fetch('Nodes.txt')
         parseNodes();
         drawMarkers();
         updateEdges();
+        console.log(nodes);
     });
 
 // init (after user selects data)
@@ -28,8 +29,10 @@ function init(txt, isLatestData) {
         commandLoop();
     } else { // custom data
         nodesTxt = txt;
-        drawPreview();
         parseNodes();
+        console.log(nodes);
+        updatePreview();
+        drawPreview();
         drawTable();
         drawMarkers();
         updateEdges();

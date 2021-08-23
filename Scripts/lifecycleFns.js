@@ -42,7 +42,10 @@ function parseNodes() {
         let els = lines.shift().split(" ");
         let [node, neighs] = [nodes.get(els.shift()), els];
         neighs.forEach(neigh => {
-            node.neighbors.add(neigh.replace('\r', ''));
+            neigh = neigh.replace('\r', '');
+            if (neigh != "") {
+                node.neighbors.add(neigh);
+            }
         });
     }
 }
@@ -105,6 +108,7 @@ function drawTable() {
         const [c1, c2, c3, c4] = [0, 0, 0, 0].map(el => row.insertCell());
         const [name, lat, lon] = [props.name, props.latitude, props.longitude, props.neighbors.values()];
         const neighsIterator = props.neighbors.values();
+        console.log([...neighsIterator]);
         const neighs = [...neighsIterator].map(id => " " + nodes.get(id.toString()).name);
         if (inModifyMode) {
             // Add NAME input cell
